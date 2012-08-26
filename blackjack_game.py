@@ -16,22 +16,22 @@ class Blackjack:
         self.player = self.deck.pop(0) + self.deck.pop(1)
         self.dealer = self.deck.pop(0) + self.deck.pop(0)
         player_hand = []
-        player_hand.append(self.player[0]+self.player[1]+'.jpg')
-        player_hand.append(self.player[2]+self.player[3]+'.jpg')
+        player_hand.append(self.player[0]+self.player[1]+'.png')
+        player_hand.append(self.player[2]+self.player[3]+'.png')
         table = pygame.image.load('Pictures/cards/felt.jpg').convert()
         self.screen.blit(table,(0,0))
         self.dspot_x = 100
         dealer_hand = []
-        dealer_hand.append(self.dealer[0]+self.dealer[1]+'.jpg')
+        dealer_hand.append(self.dealer[0]+self.dealer[1]+'.png')
         for i in dealer_hand:
             out = pygame.image.load(('Pictures/cards/') + i).convert()
             self.screen.blit(out,(self.dspot_x,70))
-            self.dspot_x += 70
+            self.dspot_x += 30
         self.spot_x = 100
         for i in player_hand:
             out = pygame.image.load(('Pictures/cards/') + i).convert()
             self.screen.blit(out,(self.spot_x,450))
-            self.spot_x += 70
+            self.spot_x += 30
             pygame.display.flip()
 
     def score(self):
@@ -68,13 +68,13 @@ class Blackjack:
             choice = raw_input("Do you want to Hit or Stand?: ")
         while choice.lower() == "hit" and self.player_total <= 21:
             self.player += self.deck[0] 
-            next = self.deck[0][0] + self.deck[0][1] + '.jpg' 
+            next = self.deck[0][0] + self.deck[0][1] + '.png' 
             out = pygame.image.load(('Pictures/cards/') + next).convert()
             self.screen.blit(out,(self.spot_x,450))
             pygame.display.flip()
             self.deck.pop(0)
             self.score()
-            self.spot_x += 70
+            self.spot_x += 30
             if self.player_total > 21:
                 break
             print "Player has %s and with total %d." % (self.player,self.player_total)
@@ -83,19 +83,19 @@ class Blackjack:
             print "Player hand %s, total %d --- Bust!!" % (self.player, self.player_total)
             print "Dealer Wins!"            
         if choice.lower() == 'stand':
-            next = self.dealer[2] + self.dealer[3] + '.jpg'
+            next = self.dealer[2] + self.dealer[3] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
             self.screen.blit(out,(self.dspot_x,70))
             pygame.display.flip()
-            self.dspot_x += 70
+            self.dspot_x += 30
             while self.dealer_total < 17:
                 self.dealer += self.deck[0]
-                next = self.deck[0][0] + self.deck[0][1] + '.jpg'
+                next = self.deck[0][0] + self.deck[0][1] + '.png'
                 out = pygame.image.load(('Pictures/cards/') + next).convert()
                 self.screen.blit(out,(self.dspot_x,70))
                 pygame.display.flip()
                 self.deck.pop(0)
-                self.dspot_x += 70
+                self.dspot_x += 30
                 self.score()
                 if self.dealer_total > 21:
                     print "Dealer hand %s, total %d --- Bust!!" % (self.dealer, self.dealer_total)
