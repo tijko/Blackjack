@@ -20,7 +20,11 @@ class Blackjack:
         player_hand.append(self.player[2]+self.player[3]+'.png')
         table = pygame.image.load('Pictures/cards/felt.jpg').convert()
         self.screen.blit(table,(0,0))
+        decoration = pygame.image.load('Pictures/cards/start.png').convert()
+        self.screen.blit(decoration,(600,60))
         self.dspot_x = 100
+        edge = pygame.image.load('Pictures/cards/edge.png').convert()
+        self.screen.blit(edge,(172,70))
         dealer_hand = []
         dealer_hand.append(self.dealer[0]+self.dealer[1]+'.png')
         for i in dealer_hand:
