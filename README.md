@@ -1,4 +1,3 @@
-Still need to work out 'Ace' being 1 and 11.
 
 Obviously will be added in more and more design and functionality for  the pygame end.
 
