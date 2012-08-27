@@ -61,7 +61,7 @@ class Blackjack:
                 self.dealer_total += self.cards[i]
         if self.dealer_total > 21 and 'ace' in self.dealer:
             deduct = self.dealer.count('ace') * 10
-            self.dealer_total -= 
+            self.dealer_total -= deduct 
         if self.player_total > 21 and 'ace' in self.player:
             deduct = self.player.count('ace') * 10
             self.player_total -= deduct
@@ -74,14 +74,20 @@ class Blackjack:
     def player_options(self):
         self.show()
         if self.player_total == 21 and self.dealer_total != 21:
+            next = self.dealer[2] + self.dealer[3] + '.png'
+            out = pygame.image.load(('Pictures/cards/') + next).convert()
+            self.screen.blit(out,(self.dspot_x,50))
+            pygame.display.flip()
+            self.dspot_x += 30
             print "BlackJack!! -- Player Wins!! %s" % (self.player,)
             self.play_again()
             return
-        if self.dealer_total == 21 and self.dealer_total != 21:
-            print "BlackJack!! -- Dealer Wins!! %s" % (self.dealer,)
-            self.play_again()
-            return
         if self.player_total == 21 and self.dealer_total == 21:
+            next = self.dealer[2] + self.dealer[3] + '.png'
+            out = pygame.image.load(('Pictures/cards/') + next).convert()
+            self.screen.blit(out,(self.dspot_x,50))
+            pygame.display.flip()
+            self.dspot_x += 30
             print "PUSH! Double BlackJack"
             self.play_again()
             return
@@ -112,6 +118,10 @@ class Blackjack:
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
             self.dspot_x += 30
+            if self.dealer_total == 21:
+                print "BlackJack!! -- Dealer Wins!! %s" % (self.dealer,)
+                self.play_again()
+                return
             while self.dealer_total < 17:
                 self.dealer += self.deck[0]
                 next = self.deck[0][0] + self.deck[0][1] + '.png'
