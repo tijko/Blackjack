@@ -18,22 +18,26 @@ class Blackjack:
         player_hand = []
         player_hand.append(self.player[0]+self.player[1]+'.png')
         player_hand.append(self.player[2]+self.player[3]+'.png')
+        self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
+        self.dealer_blackjack = pygame.image.load('Pictures/cards/dealer_blackjack.png').convert_alpha()
+        self.player_blackjack = pygame.image.load('Pictures/cards/player_blackjack.png').convert_alpha()
+        self.dealer_wins = pygame.image.load('Pictures/cards/dealer_wins.png').convert_alpha()
+        self.player_wins = pygame.image.load('Pictures/cards/player_wins.png').convert_alpha()
+        self.tie = pygame.image.load('Pictures/cards/tie.png').convert_alpha()
         backdrop = pygame.image.load('Pictures/cards/black.jpg').convert()
         self.screen.blit(backdrop,(0,0))
-        table = pygame.image.load('Pictures/cards/new.png').convert()
-        table.set_colorkey((255,255,255))
+        table = pygame.image.load('Pictures/cards/new.png').convert_alpha()
         self.screen.blit(table,(0,0))
-        banner = pygame.image.load('Pictures/cards/banner.png').convert()
-        banner.set_colorkey((255,255,255))
+        banner = pygame.image.load('Pictures/cards/banner.png').convert_alpha()
         self.screen.blit(banner,(205,450))
         decoration = pygame.image.load('Pictures/cards/start.png').convert()
         self.screen.blit(decoration,(565,80))
-        stand = pygame.image.load('Pictures/cards/stand.png').convert()
-        stand.set_colorkey((255,255,255))
-        self.screen.blit(stand,(545,310))
-        hit = pygame.image.load('Pictures/cards/hit.png').convert()
-        hit.set_colorkey((255,255,255))
-        self.screen.blit(hit,(475,330))
+        stand = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
+        self._stand = self.screen.blit(stand,(545,310))
+        deal = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
+        self._deal = self.screen.blit(deal,(615,290))
+        hit = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
+        self._hit = self.screen.blit(hit,(475,330))
         self.dspot_x = 260
         edge = pygame.image.load('Pictures/cards/edge.png').convert()
         self.screen.blit(edge,(332,50))
@@ -66,95 +70,96 @@ class Blackjack:
             deduct = self.player.count('ace') * 10
             self.player_total -= deduct
 
-    def show(self):
+    def deal(self):
+        self.__init__()
         self.score()
-        print "Player has %s and total %d" % (self.player, self.player_total)
-        print "Dealer has %s showing." % (self.dealer[:2],)
-    
-    def player_options(self):
-        self.show()
         if self.player_total == 21 and self.dealer_total != 21:
             next = self.dealer[2] + self.dealer[3] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
             self.dspot_x += 30
-            print "BlackJack!! -- Player Wins!! %s" % (self.player,)
-            self.play_again()
+            self.screen.blit(self.player_blackjack,(300,200))
+            pygame.display.flip()
+            self.main()
             return
         if self.player_total == 21 and self.dealer_total == 21:
             next = self.dealer[2] + self.dealer[3] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
-            self.dspot_x += 30
-            print "PUSH! Double BlackJack"
-            self.play_again()
-            return
-        choice = raw_input("Do you want to Hit or Stand?: ")
-        while choice.lower() != "hit" and choice.lower() != "stand":
-            choice = raw_input("Do you want to Hit or Stand?: ")
-        while choice.lower() == "hit" and self.player_total <= 21:
-            self.player += self.deck[0] 
-            next = self.deck[0][0] + self.deck[0][1] + '.png' 
-            out = pygame.image.load(('Pictures/cards/') + next).convert()
-            self.screen.blit(out,(self.spot_x,265))
+            self.dspot_x += 30 
+            self.screen.blit(self.tie,(300,200))
             pygame.display.flip()
-            self.deck.pop(0)
-            self.score()
-            self.spot_x += 30
-            if self.player_total > 21:
-                break
-            print "Player has %s and with total %d." % (self.player,self.player_total)
-            choice = raw_input("Do you want to Hit or Stand?: ")
-            while choice.lower() != 'stand' and choice.lower() != 'hit':
-                choice = raw_input("Do you want to Hit or Stand?: ")
+            self.main()
+            return
+
+    def hit(self):
+        self.player += self.deck[0] 
+        next = self.deck[0][0] + self.deck[0][1] + '.png' 
+        out = pygame.image.load(('Pictures/cards/') + next).convert()
+        self.screen.blit(out,(self.spot_x,265))
+        pygame.display.flip()
+        self.deck.pop(0)
+        self.score()
+        self.spot_x += 30
         if self.player_total > 21:
-            print "Player hand %s, total %d --- Bust!!" % (self.player, self.player_total)
-            print "Dealer Wins!"            
-        if choice.lower() == 'stand':
-            next = self.dealer[2] + self.dealer[3] + '.png'
+            self.screen.blit(self.bust,(300,200))
+            pygame.display.flip()
+            self.main()            
+
+    def stand(self):
+        next = self.dealer[2] + self.dealer[3] + '.png'
+        out = pygame.image.load(('Pictures/cards/') + next).convert()
+        self.screen.blit(out,(self.dspot_x,50))
+        pygame.display.flip()
+        self.dspot_x += 30
+        if self.dealer_total == 21:
+            self.screen.blit(self.dealer_blackjack,(300,200))
+            pygame.display.flip()
+            self.main()
+            return
+        while self.dealer_total < 17:
+            self.dealer += self.deck[0]
+            next = self.deck[0][0] + self.deck[0][1] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
+            self.deck.pop(0)
             self.dspot_x += 30
-            if self.dealer_total == 21:
-                print "BlackJack!! -- Dealer Wins!! %s" % (self.dealer,)
-                self.play_again()
-                return
-            while self.dealer_total < 17:
-                self.dealer += self.deck[0]
-                next = self.deck[0][0] + self.deck[0][1] + '.png'
-                out = pygame.image.load(('Pictures/cards/') + next).convert()
-                self.screen.blit(out,(self.dspot_x,50))
+            self.score()
+            if self.dealer_total > 21:
+                self.screen.blit(self.player_wins,(300,200))
                 pygame.display.flip()
-                self.deck.pop(0)
-                self.dspot_x += 30
-                self.score()
-                if self.dealer_total > 21:
-                    print "Dealer hand %s, total %d --- Bust!!" % (self.dealer, self.dealer_total)
-                    print "Player Wins!"
-                    self.play_again()
-                    return
-            print "Player Hand/Score: %s %d" % (self.player, self.player_total)
-            print "Dealer Hand/Score: %s %d" % (self.dealer, self.dealer_total)
+                self.main()
+                return
             if self.player_total > self.dealer_total:
-                print "Player Wins!!"
+                self.screen.blit(self.player_wins,(300,200))
+                pygame.display.flip()
             if self.dealer_total > self.player_total:
-                print "Dealer Wins!!"
+                self.screen.blit(self.dealer_wins,(300,200))
+                pygame.display.flip()
             elif self.dealer_total == self.player_total:
-                print "Draw"
-        self.play_again()
+                self.screen.blit(self.tie,(300,200))
+                pygame.display.flip()
 
-    def play_again(self):
-        game = raw_input("Play again? ")
-        while game.lower() != 'yes' and game.lower() != 'no':
-            game = raw_input("Play again, yes or no? -- ") 
-        if game.lower() == 'yes':
-            Blackjack().player_options()
-        if game.lower() == 'no':
-            return
+    def main(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    if self._stand.collidepoint(pos) and self.dealer_total < 17:
+                        self.stand()
+                    if self._deal.collidepoint(pos):
+                        self.deal()
+                    if self._hit.collidepoint(pos) and self.player_total < 22: 
+                        self.hit()
+             
+Blackjack().main()
 
-Blackjack().player_options()
 
 
