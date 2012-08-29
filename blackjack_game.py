@@ -41,6 +41,7 @@ class Blackjack:
         self.dspot_x = 260
         edge = pygame.image.load('Pictures/cards/edge.png').convert()
         self.screen.blit(edge,(332,50))
+        self.flag = 0
         dealer_hand = []
         dealer_hand.append(self.dealer[0]+self.dealer[1]+'.png')
         for i in dealer_hand:
@@ -71,6 +72,7 @@ class Blackjack:
             self.player_total -= deduct
 
     def deal(self):
+        self.flag = 0
         self.__init__()
         self.score()
         if self.player_total == 21 and self.dealer_total != 21:
@@ -79,8 +81,9 @@ class Blackjack:
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
             self.dspot_x += 30
-            self.screen.blit(self.player_blackjack,(300,200))
+            self.screen.blit(self.player_blackjack,(230,200))
             pygame.display.flip()
+            self.flag += 1
             self.main()
             return
         if self.player_total == 21 and self.dealer_total == 21:
@@ -89,8 +92,9 @@ class Blackjack:
             self.screen.blit(out,(self.dspot_x,50))
             pygame.display.flip()
             self.dspot_x += 30 
-            self.screen.blit(self.tie,(300,200))
+            self.screen.blit(self.tie,(230,200))
             pygame.display.flip()
+            self.flag += 1
             self.main()
             return
 
@@ -104,22 +108,36 @@ class Blackjack:
         self.score()
         self.spot_x += 30
         if self.player_total > 21:
-            self.screen.blit(self.bust,(300,200))
+            self.screen.blit(self.bust,(200,200))
             pygame.display.flip()
+            self.flag += 1
             self.main()            
 
     def stand(self):
+        self.flag += 1
         next = self.dealer[2] + self.dealer[3] + '.png'
         out = pygame.image.load(('Pictures/cards/') + next).convert()
         self.screen.blit(out,(self.dspot_x,50))
         pygame.display.flip()
         self.dspot_x += 30
         if self.dealer_total == 21:
-            self.screen.blit(self.dealer_blackjack,(300,200))
+            self.screen.blit(self.dealer_blackjack,(250,200))
             pygame.display.flip()
             self.main()
             return
-        while self.dealer_total < 17:
+        if self.dealer_total > 16:
+            if self.dealer_total > self.player_total:
+                self.screen.blit(self.dealer_wins,(240,200))
+                pygame.display.flip()
+            if self.player_total > self.dealer_total:
+                self.screen.blit(self.player_wins,(240,200))
+                pygame.display.flip()
+            if self.player_total == self.dealer_total:
+                self.screen.blit(self.tie,(240,200))
+                pygame.display.flip()
+            self.main()
+            return
+        while self.dealer_total < 17 and self.dealer_total < self.player_total:
             self.dealer += self.deck[0]
             next = self.deck[0][0] + self.deck[0][1] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
@@ -129,19 +147,19 @@ class Blackjack:
             self.dspot_x += 30
             self.score()
             if self.dealer_total > 21:
-                self.screen.blit(self.player_wins,(300,200))
+                self.screen.blit(self.player_wins,(250,200))
                 pygame.display.flip()
                 self.main()
                 return
-            if self.player_total > self.dealer_total:
-                self.screen.blit(self.player_wins,(300,200))
-                pygame.display.flip()
-            if self.dealer_total > self.player_total:
-                self.screen.blit(self.dealer_wins,(300,200))
-                pygame.display.flip()
-            elif self.dealer_total == self.player_total:
-                self.screen.blit(self.tie,(300,200))
-                pygame.display.flip()
+        if self.player_total > self.dealer_total:
+            self.screen.blit(self.player_wins,(260,200))
+            pygame.display.flip()
+        if self.dealer_total > self.player_total:
+            self.screen.blit(self.dealer_wins,(260,200))
+            pygame.display.flip()
+        elif self.dealer_total == self.player_total:
+            self.screen.blit(self.tie,(250,200))
+            pygame.display.flip()
 
     def main(self):
         while True:
@@ -152,14 +170,12 @@ class Blackjack:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
-                    if self._stand.collidepoint(pos) and self.dealer_total < 17:
+                    if self._stand.collidepoint(pos) and self.flag == 0:
                         self.stand()
                     if self._deal.collidepoint(pos):
                         self.deal()
-                    if self._hit.collidepoint(pos) and self.player_total < 22: 
+                    if self._hit.collidepoint(pos) and self.player_total < 22 and self.flag == 0: 
                         self.hit()
              
 Blackjack().main()
-
-
 
