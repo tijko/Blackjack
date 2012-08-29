@@ -137,7 +137,7 @@ class Blackjack:
                 pygame.display.flip()
             self.main()
             return
-        while self.dealer_total < 17 and self.dealer_total < self.player_total:
+        while self.dealer_total < 17:
             self.dealer += self.deck[0]
             next = self.deck[0][0] + self.deck[0][1] + '.png'
             out = pygame.image.load(('Pictures/cards/') + next).convert()
