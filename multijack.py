@@ -8,21 +8,6 @@ from twisted.internet import reactor, protocol
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.mouse.set_visible(1)
-backdrop = pygame.image.load('Pictures/cards/black.jpg').convert()
-screen.blit(backdrop,(0,0))
-table = pygame.image.load('Pictures/cards/new.png').convert_alpha()
-screen.blit(table,(0,0))
-banner = pygame.image.load('Pictures/cards/banner.png').convert_alpha()
-screen.blit(banner,(205,450))
-decoration = pygame.image.load('Pictures/cards/start.png').convert()
-screen.blit(decoration,(565,80))
-stand_image = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
-stand_rect = screen.blit(stand_image,(545,310))
-deal_image = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
-deal_rect = screen.blit(deal_image,(615,290))
-hit_image = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
-hit_rect = screen.blit(hit_image,(475,330))
-pygame.display.flip()
 
 bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
 dealer_blackjack = pygame.image.load('Pictures/cards/dealer_blackjack.png').convert_alpha()
@@ -30,6 +15,29 @@ player_blackjack = pygame.image.load('Pictures/cards/player_blackjack.png').conv
 dealer_wins = pygame.image.load('Pictures/cards/dealer_wins.png').convert_alpha()
 player_wins = pygame.image.load('Pictures/cards/player_wins.png').convert_alpha()
 tie = pygame.image.load('Pictures/cards/tie.png').convert_alpha()
+stand_image = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
+deal_image = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
+hit_image = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
+stand_rect = screen.blit(stand_image,(545,310))
+deal_rect = screen.blit(deal_image,(615,290))
+hit_rect = screen.blit(hit_image,(475,330))
+
+def default_screen():
+    backdrop = pygame.image.load('Pictures/cards/black.jpg').convert()
+    screen.blit(backdrop,(0,0))
+    table = pygame.image.load('Pictures/cards/new.png').convert_alpha()
+    screen.blit(table,(0,0))
+    banner = pygame.image.load('Pictures/cards/banner.png').convert_alpha()
+    screen.blit(banner,(205,450))
+    decoration = pygame.image.load('Pictures/cards/start.png').convert()
+    screen.blit(decoration,(565,80))
+    stand_image = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
+    deal_image = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
+    hit_image = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
+    stand_rect = screen.blit(stand_image,(545,310))
+    deal_rect = screen.blit(deal_image,(615,290))
+    hit_rect = screen.blit(hit_image,(475,330))
+    pygame.display.flip()
 
 ## Total/Deal/Hold/Take all the classes are getting fucked up because when instantiated in others they are called multiple times ##
 ## time to pass them in as inheritance ;) ##
@@ -106,7 +114,8 @@ class Hold(Total):
         return
 
 def main():
-#    Players()   
+#    Players()
+    default_screen()  
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -149,6 +158,7 @@ def main():
                         screen.blit(tie,(250,200))
                         pygame.display.flip()        
                 if deal_rect.collidepoint(pos):
+                    default_screen()
                     deal = Deal()
                 ## this will be a list of of players with new version ##
                     player_hand = []
@@ -188,8 +198,7 @@ def main():
                         dspot_x += 30 
                         screen.blit(tie,(230,200))
                         pygame.display.flip()
-                if hit_rect.collidepoint(pos) and player_amount < 22:
-                    ## add these to the player hand ##
+                if hit_rect.collidepoint(pos) and player_amount < 21:
                     new_card = Take().card()
                     player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
