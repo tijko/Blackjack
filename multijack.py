@@ -34,28 +34,6 @@ tie = pygame.image.load('Pictures/cards/tie.png').convert_alpha()
 ## Total/Deal/Hold/Take all the classes are getting fucked up because when instantiated in others they are called multiple times ##
 ## time to pass them in as inheritance ;) ##
 
-class Take(object):
-    def __init__(self):
-        shuffle = Shuffle()
-        deal = Deal()  
-        deal.player += shuffle.deck[0] 
-        return
-
-class Hold(object):
-    def __init__(self):
-        deal = Deal()
-        total = Total()
-        shuffle = Shuffle()
-        if total.dealer_total > 16:
-            return    
-        while total.dealer_total < 17:
-            deal.dealer += shuffle.deck[0]
-            shuffle.deck.pop(0)
-            Total()
-            if total.dealer_total > 21:
-                return
-        return
-
 class Players(object):
     def __init__(self):
         self.player_list = []
@@ -94,6 +72,11 @@ class Deal(Shuffle):
         self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
         return
 
+class Take(Deal):
+    def __init__(self):
+        self.player += self.deck[0] 
+        return
+
 class Total(Deal):
     def __init__(self):
         Deal.__init__(self)
@@ -111,6 +94,19 @@ class Total(Deal):
         if self.player_total > 21 and 'ace' in self.player:
             deduct = self.player.count('ace') * 10
             self.player_total -= deduct
+        return
+
+class Hold(Total):
+    def __init__(self):
+        Total.__init__(self)
+        if self.dealer_total > 16:
+            return    
+        while self.dealer_total < 17:
+            self.dealer += self.deck[0]
+            self.deck.pop(0)
+            Total()
+            if self.dealer_total > 21:
+                return
         return
 
 def main():
