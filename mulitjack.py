@@ -30,7 +30,10 @@ player_blackjack = pygame.image.load('Pictures/cards/player_blackjack.png').conv
 dealer_wins = pygame.image.load('Pictures/cards/dealer_wins.png').convert_alpha()
 player_wins = pygame.image.load('Pictures/cards/player_wins.png').convert_alpha()
 tie = pygame.image.load('Pictures/cards/tie.png').convert_alpha()
-        
+
+## Total/Deal/Hold/Take all the classes are getting fucked up because when instantiated in others they are called multiple times ##
+## time to pass them in as inheritance ;) ##
+
 class Total(object):
     def __init__(self):
         deal = Deal()
@@ -95,21 +98,20 @@ class Players(object):
 ## probably ##
 ## create this into separate 'main' function 'looping' ##
 
-class Deal(object):
-    def __init__(self):
-        shuffle = Shuffle()
-        players = Players()
-        Shuffle()
-        self.player = shuffle.deck.pop(0) + shuffle.deck.pop(1)
-        self.dealer = shuffle.deck.pop(0) + shuffle.deck.pop(1)	    
-        return
-
 class Shuffle(object):
     def __init__(self):
         self.suits = ['heart','diamond','spade','club'] * 13
         self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
         self.deck = list(itertools.izip(self.suits,self.cards.keys() * 4)) * 6
         random.shuffle(self.deck)
+        return
+
+class Deal(Shuffle):
+    def __init__(self):
+        Shuffle.__init__(self)
+        players = Players()
+        self.player = self.deck.pop(0) + self.deck.pop(1)
+        self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
         return
 
 def main():
@@ -122,7 +124,7 @@ def main():
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if stand_rect.collidepoint(pos): # and self.flag == 0:
+                if stand_rect.collidepoint(pos): 
                     total = Total()
                     draw = deal.dealer[2] + deal.dealer[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
@@ -190,7 +192,7 @@ def main():
                         dspot_x += 30 
                         screen.blit(tie,(230,200))
                         pygame.display.flip()
-                if hit_rect.collidepoint(pos) and total.player_total < 22: # and self.flag == 0: 
+                if hit_rect.collidepoint(pos) and total.player_total < 22:
                     Take()
                     shuffle = Shuffle()
                     draw = shuffle.deck[0][0] + shuffle.deck[0][1] + '.png' 
