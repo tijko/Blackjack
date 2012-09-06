@@ -39,9 +39,6 @@ def default_screen():
     hit_rect = screen.blit(hit_image,(475,330))
     pygame.display.flip()
 
-## Total/Deal/Hold/Take all the classes are getting fucked up because when instantiated in others they are called multiple times ##
-## time to pass them in as inheritance ;) ##
-
 class Players(object):
     def __init__(self):
         self.player_list = []
@@ -99,23 +96,21 @@ class Total(Shuffle):
             self.amount -= deduct 
         return self.amount
 
-## in main// instead of inheritating 'Total' // pass in the results from total ##
 class Hold(Total):
-    def __init__(self):
+    def dealer_hit(self,score):
         Total.__init__(self)
-        if self.dealer_total > 16:
+        comp = self.tally(score)
+        if comp > 16:
             return    
-        while self.dealer_total < 17:
-            self.dealer += self.deck[0]
+        if comp < 17:
+            self.card = self.deck[0]
             self.deck.pop(0)
-            Total()
-            if self.dealer_total > 21:
-                return
-        return
+            return self.card
+        
 
 def main():
-#    Players()
-    default_screen()  
+#    Players()  
+    default_screen()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -124,42 +119,48 @@ def main():
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if stand_rect.collidepoint(pos):
-                    ## add these to the cpu hand ## 
-                    total = Total()
-                    draw = deal.dealer[2] + deal.dealer[3] + '.png'
+                if stand_rect.collidepoint(pos): 
+                    draw = dealer_cards[2] + dealer_cards[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     screen.blit(out,(dspot_x,50))
                     pygame.display.flip()
                     dspot_x += 30
-                    if total.dealer_total == 21:
+                    if dealer_amount == 21:
                         screen.blit(dealer_blackjack,(230,200))
                         pygame.display.flip()
-                    Hold()
-                    if total.dealer_total > 21:
+                    if dealer_amount > 16 and dealer_amount < player_amount:
                         screen.blit(player_wins,(250,200))
                         pygame.display.flip()
-                    suit = 0
-                    value = 1
-                    while value <= len(deal.dealer):
-                        draw = deal.dealer[suit] + deal.dealer[value] + '.png'
-                        suit += 2
-                        value += 2
+                    if dealer_amount > 16 and dealer_amount > player_amount:
+                        screen.blit(dealer_wins,(260,200))
+                        pygame.display.flip()
+                    if dealer_amount > 16 and dealer_amount == player_amount:
+                        screen.blit(tie,(250,200))
+                        pygame.display.flip()
+                    while dealer_amount < 17:                    
+                        new = Hold().dealer_hit(dealer_score)
+                        draw = new[0] + new[1] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         screen.blit(out,(dspot_x,50))
                         pygame.display.flip()
-                    if total.player_total > total.dealer_total and total.player_total < 22:
+                        dealer_score.append(new[1])
+                        dealer_amount = Total().tally(dealer_score)
+                    if dealer_amount > 21:
+                        screen.blit(player_wins,(250,200))
+                        pygame.display.flip()      
+                    if player_amount > dealer_amount and player_amount < 22:
                         screen.blit(player_wins,(250,200))
                         pygame.display.flip()
-                    if total.player_total < total.dealer_total and total.dealer_total < 22:
+                    if player_amount < dealer_amount and dealer_amount < 22:
                         screen.blit(dealer_wins,(260,200))
                         pygame.display.flip()
-                    elif total.dealer_total == total.player_total:
+                    elif dealer_amount == player_amount:
                         screen.blit(tie,(250,200))
                         pygame.display.flip()        
                 if deal_rect.collidepoint(pos):
                     default_screen()
                     deal = Deal()
+                    dealer_cards = deal.dealer
                 ## this will be a list of of players with new version ##
                     player_hand = []
                     player_hand.append(deal.player[0]+deal.player[1]+'.png')
@@ -198,6 +199,7 @@ def main():
                         dspot_x += 30 
                         screen.blit(tie,(230,200))
                         pygame.display.flip()
+                ## put in flag for blackjack i don't like not being able to hit on 21 (its your hand) ##
                 if hit_rect.collidepoint(pos) and player_amount < 21:
                     new_card = Take().card()
                     player_score.append(new_card[1])
@@ -213,5 +215,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
