@@ -72,30 +72,26 @@ class Deal(Shuffle):
         self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
         return
 
-class Take(Deal):
-    def __init__(self):
-        self.player += self.deck[0] 
-        return
+class Take(Shuffle):
+    def card(self):
+        Shuffle.__init__(self)
+        self.card = self.deck[0]
+        self.deck.pop(0) 
+        return self.card
 
-class Total(Deal):
-    def __init__(self):
-        Deal.__init__(self)
-        self.player_total = 0
-        self.dealer_total = 0
-        for i in self.player:
+class Total(Shuffle):
+    def tally(self,score):
+        Shuffle.__init__(self)
+        self.amount = 0
+        for i in score:
             if self.cards.has_key(i):
-                self.player_total += self.cards[i] 
-        for i in self.dealer:
-            if self.cards.has_key(i):
-                self.dealer_total += self.cards[i]
-        if self.dealer_total > 21 and 'ace' in self.dealer:
-            deduct = self.dealer.count('ace') * 10
-            self.dealer_total -= deduct 
-        if self.player_total > 21 and 'ace' in self.player:
-            deduct = self.player.count('ace') * 10
-            self.player_total -= deduct
-        return
+                self.amount += self.cards[i] 
+        if self.amount > 21 and 'ace' in score:
+            deduct = score.count('ace') * 10
+            self.amount -= deduct 
+        return self.amount
 
+## in main// instead of inheritating 'Total' // pass in the results from total ##
 class Hold(Total):
     def __init__(self):
         Total.__init__(self)
@@ -119,7 +115,8 @@ def main():
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if stand_rect.collidepoint(pos): 
+                if stand_rect.collidepoint(pos):
+                    ## add these to the cpu hand ## 
                     total = Total()
                     draw = deal.dealer[2] + deal.dealer[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
@@ -172,31 +169,35 @@ def main():
                         screen.blit(out,(dspot_x,50))
                         dspot_x += 30
                     pygame.display.flip()
-                    total = Total()
-                    if total.player_total == 21 and total.dealer_total != 21:
+                    ## just want player[1] & player[3] ##
+                    player_score = [deal.player[1], deal.player[3]]
+                    dealer_score = [deal.dealer[1], deal.dealer[3]]
+                    player_amount = Total().tally(player_score)
+                    dealer_amount = Total().tally(dealer_score)
+                    if player_amount == 21 and dealer_amount != 21:
                         draw = deal.dealer[2] + deal.dealer[3] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         screen.blit(out,(dspot_x,50))
                         dspot_x += 30
                         screen.blit(player_blackjack,(230,200))
                         pygame.display.flip()
-                    if total.player_total == 21 and total.dealer_total == 21:
+                    if player_amount == 21 and dealer_amount == 21:
                         draw = deal.dealer[2] + deal.dealer[3] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         screen.blit(out,(dspot_x,50))
                         dspot_x += 30 
                         screen.blit(tie,(230,200))
                         pygame.display.flip()
-                if hit_rect.collidepoint(pos) and total.player_total < 22:
-                    Take()
-                    shuffle = Shuffle()
-                    draw = shuffle.deck[0][0] + shuffle.deck[0][1] + '.png' 
-                    out = pygame.image.load(('Pictures/cards/') + next).convert()
+                if hit_rect.collidepoint(pos) and player_amount < 22:
+                    ## add these to the player hand ##
+                    new_card = Take().card()
+                    player_score.append(new_card[1])
+                    draw =  new_card[0] + new_card[1] + '.png' 
+                    out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     screen.blit(out,(spot_x,265))
-                    total = Total()
+                    player_amount = Total().tally(player_score)
                     spot_x += 30
-                    shuffle.deck.pop(0)
-                    if total.player_total > 21:
+                    if player_amount > 21:
                         screen.blit(bust,(200,200))
                     pygame.display.flip()
  
