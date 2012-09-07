@@ -110,7 +110,10 @@ class Hold(Total):
 
 def main():
 #    Players()  
+    flag = 0
     default_screen()
+## got a weird scoring result // breakdown: i stood at 7,8 right off the bat and dealer turned over 3,4 took one card 7 and stood?/declared winner? ##
+## something with Take class // double ace with king and stood? ##
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -119,7 +122,7 @@ def main():
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if stand_rect.collidepoint(pos): 
+                if stand_rect.collidepoint(pos) and flag < 1: 
                     draw = dealer_cards[2] + dealer_cards[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     screen.blit(out,(dspot_x,50))
@@ -128,15 +131,19 @@ def main():
                     if dealer_amount == 21:
                         screen.blit(dealer_blackjack,(230,200))
                         pygame.display.flip()
-                    if dealer_amount > 16 and dealer_amount < player_amount:
+                        flag += 1
+                    if dealer_amount > 16 and dealer_amount < player_amount and flag < 1:
                         screen.blit(player_wins,(250,200))
                         pygame.display.flip()
-                    if dealer_amount > 16 and dealer_amount > player_amount:
+                        flag += 1
+                    if dealer_amount > 16 and dealer_amount > player_amount and flag < 1:
                         screen.blit(dealer_wins,(260,200))
                         pygame.display.flip()
-                    if dealer_amount > 16 and dealer_amount == player_amount:
+                        flag += 1
+                    if dealer_amount > 16 and dealer_amount == player_amount and flag < 1:
                         screen.blit(tie,(250,200))
                         pygame.display.flip()
+                        flag += 1
                     while dealer_amount < 17:                    
                         new = Hold().dealer_hit(dealer_score)
                         draw = new[0] + new[1] + '.png'
@@ -145,19 +152,24 @@ def main():
                         pygame.display.flip()
                         dealer_score.append(new[1])
                         dealer_amount = Total().tally(dealer_score)
-                    if dealer_amount > 21:
-                        screen.blit(player_wins,(250,200))
-                        pygame.display.flip()      
-                    if player_amount > dealer_amount and player_amount < 22:
+                    if dealer_amount > 21 and flag < 1:
                         screen.blit(player_wins,(250,200))
                         pygame.display.flip()
-                    if player_amount < dealer_amount and dealer_amount < 22:
+                        flag += 1      
+                    if player_amount > dealer_amount and player_amount < 22 and flag < 1:
+                        screen.blit(player_wins,(250,200))
+                        pygame.display.flip()
+                        flag += 1
+                    if player_amount < dealer_amount and dealer_amount < 22 and flag < 1:
                         screen.blit(dealer_wins,(260,200))
                         pygame.display.flip()
-                    elif dealer_amount == player_amount:
+                        flag += 1
+                    elif dealer_amount == player_amount and flag < 1:
                         screen.blit(tie,(250,200))
-                        pygame.display.flip()        
+                        pygame.display.flip()
+                        flag += 1        
                 if deal_rect.collidepoint(pos):
+                    flag = 0
                     default_screen()
                     deal = Deal()
                     dealer_cards = deal.dealer
@@ -180,7 +192,6 @@ def main():
                         screen.blit(out,(dspot_x,50))
                         dspot_x += 30
                     pygame.display.flip()
-                    ## just want player[1] & player[3] ##
                     player_score = [deal.player[1], deal.player[3]]
                     dealer_score = [deal.dealer[1], deal.dealer[3]]
                     player_amount = Total().tally(player_score)
@@ -192,6 +203,7 @@ def main():
                         dspot_x += 30
                         screen.blit(player_blackjack,(230,200))
                         pygame.display.flip()
+                        flag += 1
                     if player_amount == 21 and dealer_amount == 21:
                         draw = deal.dealer[2] + deal.dealer[3] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
@@ -199,8 +211,8 @@ def main():
                         dspot_x += 30 
                         screen.blit(tie,(230,200))
                         pygame.display.flip()
-                ## put in flag for blackjack i don't like not being able to hit on 21 (its your hand) ##
-                if hit_rect.collidepoint(pos) and player_amount < 21:
+                        flag += 1
+                if hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1:
                     new_card = Take().card()
                     player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
@@ -210,6 +222,7 @@ def main():
                     spot_x += 30
                     if player_amount > 21:
                         screen.blit(bust,(200,200))
+                        flag += 1
                     pygame.display.flip()
  
 
