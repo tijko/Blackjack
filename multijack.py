@@ -112,8 +112,6 @@ def main():
 #    Players()  
     flag = 0
     default_screen()
-## got a weird scoring result // breakdown: i stood at 7,8 right off the bat and dealer turned over 3,4 took one card 7 and stood?/declared winner? ##
-## something with Take class // double ace with king and stood? ##
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -149,6 +147,7 @@ def main():
                         draw = new[0] + new[1] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         screen.blit(out,(dspot_x,50))
+                        dspot_x += 30
                         pygame.display.flip()
                         dealer_score.append(new[1])
                         dealer_amount = Total().tally(dealer_score)
