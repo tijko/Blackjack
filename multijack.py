@@ -40,69 +40,7 @@ def default_screen():
     hit_rect = screen.blit(hit_image,(562,445))
     pygame.display.flip()
 
-class Shuffle(object):
-    def __init__(self):
-        self.suits = ['heart','diamond','spade','club'] * 13
-        self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
-        self.deck = list(itertools.izip(self.suits,self.cards.keys() * 4)) * 6
-        random.shuffle(self.deck)
-        return
-
-class Deal(Shuffle):
-    def __init__(self,line=None):
-        Shuffle.__init__(self)
-        self.line = line
-        self.allplayers = []
-        self.allcards = []
-        if self.line:
-            self.allplayers.append(list(self.line))
-            for player in self.allplayers: 
-                self.allcards.append(self.deck.pop(0) + self.deck.pop(1))
-        self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
-        return 
-            
-class ChatClientProtocol(LineReceiver):
-    def lineReceived(self,line):
-        deal = Deal(line)
-        print deal.allcards
-        print (line)
-
-class ChatClient(ClientFactory):
-    def __init__(self):
-        self.protocol = ChatClientProtocol
-
-
-class Take(Shuffle):
-    def card(self):
-        Shuffle.__init__(self)
-        self.card = self.deck[0]
-        self.deck.pop(0) 
-        return self.card
-
-class Total(Shuffle):
-    def tally(self,score):
-        Shuffle.__init__(self)
-        self.amount = 0
-        for i in score:
-            if self.cards.has_key(i):
-                self.amount += self.cards[i] 
-        if self.amount > 21 and 'ace' in score:
-            deduct = score.count('ace') * 10
-            self.amount -= deduct 
-        return self.amount
-
-class Hold(Total):
-    def dealer_hit(self,score):
-        Total.__init__(self)
-        comp = self.tally(score)
-        if comp > 16:
-            return    
-        if comp < 17:
-            self.card = self.deck[0]
-            self.deck.pop(0)
-            return self.card
-        
-def main(x):
+def main(line=None):
     flag = 0
     while True:
         for event in pygame.event.get():
@@ -162,13 +100,13 @@ def main(x):
                 if deal_rect.collidepoint(pos):
                     flag = 0
                     default_screen()
-                    deal = Deal(x)
+                    deal = Deal()
                     dealer_cards = deal.dealer
                     spot_x = 50
                     spot_y = 240
                     suit = 0
                     card = 1
-                    for player in deal.line:
+                    for player in deal.allplayers:
                         player_hand = []
                         player_hand.append(deal.allcards[suit]+deal.allcards[card]+'.png')
                         player_hand.append(deal.allcards[suit+2]+deal.allcards[card+2]+'.png') 
@@ -190,6 +128,7 @@ def main(x):
                         screen.blit(out,(dspot_x,100))
                         dspot_x += 30
                     pygame.display.flip()
+                    print len(deal.allcards)
                     player_score = [deal.allcards[1], deal.allcards[3]]
                     dealer_score = [deal.dealer[1], deal.dealer[3]]
                     player_amount = Total().tally(player_score)
@@ -223,6 +162,68 @@ def main(x):
                         flag += 1
                     pygame.display.flip()
         yield
+
+class Shuffle(object):
+    def __init__(self):
+        self.suits = ['heart','diamond','spade','club'] * 13
+        self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
+        self.deck = list(itertools.izip(self.suits,self.cards.keys() * 4)) * 6
+        random.shuffle(self.deck)
+        return
+
+class Deal(Shuffle):
+    def __init__(self,line=None):
+        Shuffle.__init__(self)
+        self.line = line
+        self.allplayers = []
+        self.allcards = []
+        if self.line:
+            self.allplayers.append(list(self.line))
+            for player in self.allplayers: 
+                self.allcards.append(self.deck.pop(0) + self.deck.pop(1))
+        self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
+            
+class ChatClientProtocol(LineReceiver):
+    def lineReceived(self,line):
+        deal = Deal(line)
+        print deal.allcards 
+        print (line)
+        main(line)
+
+class ChatClient(ClientFactory):
+    def __init__(self):
+        self.protocol = ChatClientProtocol
+
+
+class Take(Shuffle):
+    def card(self):
+        Shuffle.__init__(self)
+        self.card = self.deck[0]
+        self.deck.pop(0) 
+        return self.card
+
+class Total(Shuffle):
+    def tally(self,score):
+        Shuffle.__init__(self)
+        self.amount = 0
+        for i in score:
+            if self.cards.has_key(i):
+                self.amount += self.cards[i] 
+        if self.amount > 21 and 'ace' in score:
+            deduct = score.count('ace') * 10
+            self.amount -= deduct 
+        return self.amount
+
+class Hold(Total):
+    def dealer_hit(self,score):
+        Total.__init__(self)
+        comp = self.tally(score)
+        if comp > 16:
+            return    
+        if comp < 17:
+            self.card = self.deck[0]
+            self.deck.pop(0)
+            return self.card
 
 default_screen()
 reactor.connectTCP('192.168.1.2', 6000, ChatClient())
