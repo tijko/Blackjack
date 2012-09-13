@@ -60,13 +60,12 @@ class Deal(Shuffle):
                 self.allcards.append(self.deck.pop(0) + self.deck.pop(1))
         self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
         return 
-
-class ChatClientProtocol(LineReceiver,main):
+            
+class ChatClientProtocol(LineReceiver):
     def lineReceived(self,line):
         deal = Deal(line)
         print deal.allcards
         print (line)
-        main(line)
 
 class ChatClient(ClientFactory):
     def __init__(self):
