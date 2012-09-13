@@ -40,23 +40,6 @@ def default_screen():
     hit_rect = screen.blit(hit_image,(562,445))
     pygame.display.flip()
 
-## the server should send 'cards'(the hand being dealt) ##
-## as clients connect give 'users' a name ##
-## then i will have to put in all the logic for each user ##
-## depending on whether 'user_1' or 'user_2' and so forth this will determine where to blit cards ##
-## don't send the win/lose results those are all blitted locally // so send card info then blit as usual ##
-## change the client scripts running on jennes/ma's machines not to be able to deal ##
-
-## here is self.output:  card = self.output[0] + self.output[1] + 'png' ##
-##  
-class ChatClientProtocol(LineReceiver):
-    def lineReceived(self,line):
-        print (line)
-
-class ChatClient(ClientFactory):
-    def __init__(self):
-        self.protocol = ChatClientProtocol
-
 class Shuffle(object):
     def __init__(self):
         self.suits = ['heart','diamond','spade','club'] * 13
@@ -66,11 +49,29 @@ class Shuffle(object):
         return
 
 class Deal(Shuffle):
-    def __init__(self):
+    def __init__(self,line=None):
         Shuffle.__init__(self)
-        self.player = self.deck.pop(0) + self.deck.pop(1)
+        self.line = line
+        self.allplayers = []
+        self.allcards = []
+        if self.line:
+            self.allplayers.append(list(self.line))
+            for player in self.allplayers: 
+                self.allcards.append(self.deck.pop(0) + self.deck.pop(1))
         self.dealer = self.deck.pop(0) + self.deck.pop(1)	    
-        return
+        return 
+
+class ChatClientProtocol(LineReceiver,main):
+    def lineReceived(self,line):
+        deal = Deal(line)
+        print deal.allcards
+        print (line)
+        main(line)
+
+class ChatClient(ClientFactory):
+    def __init__(self):
+        self.protocol = ChatClientProtocol
+
 
 class Take(Shuffle):
     def card(self):
@@ -102,8 +103,7 @@ class Hold(Total):
             self.deck.pop(0)
             return self.card
         
-
-def main():
+def main(x):
     flag = 0
     while True:
         for event in pygame.event.get():
@@ -112,12 +112,8 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-## with the events pass the control of buttons with flags ##
-## so... player_1 will be if collidepoint and flag == 1 ##
-## and so on ##
                 pos = pygame.mouse.get_pos()
                 if stand_rect.collidepoint(pos) and flag < 1:
-                ## same idea as below sending player_turn_flag to other players after turns then ending at dealer ## 
                     draw = dealer_cards[2] + dealer_cards[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     screen.blit(out,(dspot_x,100))
@@ -165,20 +161,26 @@ def main():
                         pygame.display.flip()
                         flag += 1        
                 if deal_rect.collidepoint(pos):
-                    ## find out how to send each player their hand when I 'click' deal ##
-                    ## and maybe some intial state // i.e. player_turn_flag that is changed depending on what I do with 'MY' turn -- and so on ##
                     flag = 0
                     default_screen()
-                    deal = Deal()
+                    deal = Deal(x)
                     dealer_cards = deal.dealer
-                    player_hand = []
-                    player_hand.append(deal.player[0]+deal.player[1]+'.png')
-                    player_hand.append(deal.player[2]+deal.player[3]+'.png') 
                     spot_x = 50
-                    for i in player_hand:
-                        out = pygame.image.load(('Pictures/cards/') + i).convert()
-                        screen.blit(out,(spot_x,240))
-                        spot_x += 30
+                    spot_y = 240
+                    suit = 0
+                    card = 1
+                    for player in deal.line:
+                        player_hand = []
+                        player_hand.append(deal.allcards[suit]+deal.allcards[card]+'.png')
+                        player_hand.append(deal.allcards[suit+2]+deal.allcards[card+2]+'.png') 
+                        for i in player_hand:
+                            out = pygame.image.load(('Pictures/cards/') + i).convert()
+                            screen.blit(out,(spot_x,spot_y))
+                            spot_x += 30
+                        spot_x +=50
+                        spot_y += 70
+                        suit += 1
+                        card += 1
                     edge = pygame.image.load('Pictures/cards/edge.png').convert()
                     screen.blit(edge,(332,100))
                     dealer_hand = []
@@ -189,7 +191,7 @@ def main():
                         screen.blit(out,(dspot_x,100))
                         dspot_x += 30
                     pygame.display.flip()
-                    player_score = [deal.player[1], deal.player[3]]
+                    player_score = [deal.allcards[1], deal.allcards[3]]
                     dealer_score = [deal.dealer[1], deal.dealer[3]]
                     player_amount = Total().tally(player_score)
                     dealer_amount = Total().tally(dealer_score)
@@ -210,8 +212,6 @@ def main():
                         pygame.display.flip()
                         flag += 1
                 if hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1:
-                ## take a card and also send that info to blit on others screen ##
-                ## only have to total locally because only competeting against dealer ##
                     new_card = Take().card()
                     player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
@@ -226,8 +226,8 @@ def main():
         yield
 
 default_screen()
-Cooperator().coiterate(main())
 reactor.connectTCP('192.168.1.2', 6000, ChatClient())
+Cooperator().coiterate(main())
 reactor.run()
 
 
