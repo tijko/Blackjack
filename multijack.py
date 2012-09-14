@@ -113,7 +113,6 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
-        print len(self.line) 
         print self.line
 
     def tick(self):
@@ -132,15 +131,15 @@ class Client(object):
                     pygame.display.flip()
                     dspot_x += 30
                     if dealer_amount == 21:
-                        self.screen.blit(dealer_blackjack,(230,200))
+                        self.screen.blit(self.dealer_blackjack,(230,200))
                         pygame.display.flip()
                         flag += 1
                     if dealer_amount > 16 and dealer_amount < player_amount and flag < 1:
-                        self.screen.blit(player_wins,(250,200))
+                        self.screen.blit(self.player_wins,(250,200))
                         pygame.display.flip()
                         flag += 1
                     if dealer_amount > 16 and dealer_amount > player_amount and flag < 1:
-                        self.screen.blit(dealer_wins,(260,200))
+                        self.screen.blit(self.dealer_wins,(260,200))
                         pygame.display.flip()
                         flag += 1
                     if dealer_amount > 16 and dealer_amount == player_amount and flag < 1:
@@ -157,19 +156,19 @@ class Client(object):
                         dealer_score.append(new[1])
                         dealer_amount = Total().tally(dealer_score)
                     if dealer_amount > 21 and flag < 1:
-                        self.screen.blit(player_wins,(250,200))
+                        self.screen.blit(self.player_wins,(250,200))
                         pygame.display.flip()
                         flag += 1      
                     if player_amount > dealer_amount and player_amount < 22 and flag < 1:
-                        self.screen.blit(player_wins,(250,200))
+                        self.screen.blit(self.player_wins,(250,200))
                         pygame.display.flip()
                         flag += 1
                     if player_amount < dealer_amount and dealer_amount < 22 and flag < 1:
-                        self.screen.blit(dealer_wins,(260,200))
+                        self.screen.blit(self.dealer_wins,(260,200))
                         pygame.display.flip()
                         flag += 1
                     elif dealer_amount == player_amount and flag < 1:
-                        self.screen.blit(tie,(250,200))
+                        self.screen.blit(self.tie,(250,200))
                         pygame.display.flip()
                         flag += 1        
                 if self.deal_rect.collidepoint(pos):
@@ -180,20 +179,25 @@ class Client(object):
                     spot_y = 240
                     suit = 0
                     card = 1
+                    seat = 0
                     for player in self.line:
                         Deal()
                         player_hand = []
                         fresh_hand = deal.player
                         print self.line
-                        print deal.player
                         player_hand.append(fresh_hand[suit] + fresh_hand[card] + '.png')
                         player_hand.append(fresh_hand[suit + 2] + fresh_hand[card + 2] + '.png') 
                         for i in player_hand:
                             out = pygame.image.load(('Pictures/cards/') + i).convert()
                             self.screen.blit(out,(spot_x,spot_y))
                             spot_x += 30
-                        spot_x +=50
-                        spot_y += 70
+                        if seat < 1:
+                            spot_x += 180
+                            spot_y += 120
+                        if seat == 1:
+                            spot_x += 230
+                            spot_y -= 80
+                        seat += 1
                     edge = pygame.image.load('Pictures/cards/edge.png').convert()
                     self.screen.blit(edge,(332,100))
                     dealer_hand = []
@@ -213,7 +217,7 @@ class Client(object):
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         self.screen.blit(out,(dspot_x,100))
                         dspot_x += 30
-                        self.screen.blit(player_blackjack,(230,200))
+                        self.screen.blit(self.player_blackjack,(230,200))
                         pygame.display.flip()
                         flag += 1
                     if player_amount == 21 and dealer_amount == 21:
@@ -221,7 +225,7 @@ class Client(object):
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
                         self.screen.blit(out,(dspot_x,100))
                         dspot_x += 30 
-                        screen.blit(tie,(230,200))
+                        self.screen.blit(self.tie,(230,200))
                         pygame.display.flip()
                         flag += 1
                 if self.hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1:
@@ -233,7 +237,7 @@ class Client(object):
                     player_amount = Total().tally(player_score)
                     spot_x += 30
                     if player_amount > 21:
-                        self.screen.blit(bust,(200,200))
+                        self.screen.blit(self.bust,(200,200))
                         flag += 1
                     pygame.display.flip()
 
