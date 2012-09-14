@@ -14,12 +14,11 @@ class Chat(LineReceiver):
         self.players.append(new)
         self.jason = self.players
         self.jason = simplejson.dumps(self.jason) 
-#        self.sendLine(str(self.players,))       
         self.sendLine(self.jason)
 
 class ChatFactory(Factory):
     def __init__(self):
-        self.users = {} #maps instances to clients 
+        self.users = {}  
         self.players = []
 
     def buildProtocol(self, addr):
