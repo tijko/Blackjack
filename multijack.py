@@ -1,3 +1,4 @@
+import simplejson
 import pygame
 import random
 import itertools
@@ -111,6 +112,9 @@ class Client(object):
 
     def new_line(self, line):
         self.line = line
+        self.line = simplejson.loads(self.line)
+        print len(self.line) 
+        print self.line
 
     def tick(self):
         flag = 0
