@@ -8,7 +8,6 @@ from twisted.protocols.basic import LineReceiver
 from twisted.internet.task import LoopingCall
 
 class Shuffle(object):
-
     def __init__(self):
         self.suits = ['heart','diamond','spade','club'] * 13
         self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
@@ -17,15 +16,12 @@ class Shuffle(object):
         return
 
 class Deal(Shuffle):
-
     def __init__(self):
         Shuffle.__init__(self)
         self.player = self.deck.pop(0) + self.deck.pop(1)
         self.dealer = self.deck.pop(0) + self.deck.pop(1)       
 
-
 class ChatClientProtocol(LineReceiver):
-    
     def __init__(self, recv):
         self.recv = recv
 
@@ -33,7 +29,6 @@ class ChatClientProtocol(LineReceiver):
         self.recv(line)
 
 class ChatClient(ClientFactory):
-
     def __init__(self, recv):
         self.protocol = ChatClientProtocol
         self.recv = recv
@@ -42,7 +37,6 @@ class ChatClient(ClientFactory):
         return ChatClientProtocol(self.recv)
 
 class Take(Shuffle):
-
     def card(self):
         Shuffle.__init__(self)
         self.card = self.deck[0]
@@ -50,7 +44,6 @@ class Take(Shuffle):
         return self.card
 
 class Total(Shuffle):
-
     def tally(self,score):
         Shuffle.__init__(self)
         self.amount = 0
@@ -63,7 +56,6 @@ class Total(Shuffle):
         return self.amount
 
 class Hold(Total):
-
     def dealer_hit(self,score):
         Total.__init__(self)
         comp = self.tally(score)
@@ -75,7 +67,6 @@ class Hold(Total):
             return self.card
 
 class Client(object):
-
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
@@ -107,7 +98,6 @@ class Client(object):
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
         pygame.display.flip()
-
         reactor.callLater(0.1, self.tick)
 
     def new_line(self, line):
@@ -243,7 +233,6 @@ class Client(object):
 
 if __name__ == '__main__':
     c = Client()
-
     lc = LoopingCall(c.tick)
     lc.start(0.1)
     reactor.connectTCP('192.168.1.2', 6000, ChatClient(c.new_line))
