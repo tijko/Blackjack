@@ -21,6 +21,7 @@ class Deal(Shuffle):
         self.player = self.deck.pop(0) + self.deck.pop(1)
         self.dealer = self.deck.pop(0) + self.deck.pop(1)       
 
+
 class ChatClientProtocol(LineReceiver):
     def __init__(self, recv):
         self.recv = recv
@@ -171,8 +172,8 @@ class Client(object):
                     card = 1
                     seat = 0
                     for player in self.line:
-                        Deal()
                         player_hand = []
+                        deal.__init__()
                         fresh_hand = deal.player
                         print self.line
                         player_hand.append(fresh_hand[suit] + fresh_hand[card] + '.png')
@@ -233,6 +234,7 @@ class Client(object):
 
 if __name__ == '__main__':
     c = Client()
+
     lc = LoopingCall(c.tick)
     lc.start(0.1)
     reactor.connectTCP('192.168.1.2', 6000, ChatClient(c.new_line))
