@@ -4,9 +4,7 @@ from twisted.internet import reactor
 import simplejson
 
 class Chat(LineReceiver):
-    def __init__(self, users, players):
-        self.users = users
-        self.name = None
+    def __init__(self, players): 
         self.players = players
 
     def connectionMade(self):
@@ -18,11 +16,10 @@ class Chat(LineReceiver):
 
 class ChatFactory(Factory):
     def __init__(self):
-        self.users = {}  
         self.players = []
 
     def buildProtocol(self, addr):
-        return Chat(self.users,self.players)
+        return Chat(self.players) 
 
 
 reactor.listenTCP(6000, ChatFactory())
