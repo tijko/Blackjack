@@ -3,25 +3,29 @@ from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
 import simplejson
 
-class Chat(LineReceiver):
-    def __init__(self, players): 
+class Game_Data(LineReceiver):
+    def __init__(self, players, clients): 
         self.players = players
+        self.clients = clients 
 
     def connectionMade(self):
-        new = 'player_' + str(len(self.players) + 1)
-        self.players.append(new)
-        self.jason = self.players
-        self.jason = simplejson.dumps(self.jason) 
-        self.sendLine(self.jason)
+        new_player = 'player_' + str(len(self.players) + 1)
+        self.clients.append(self)
+        self.players.append(new_player)
+        self.players = simplejson.dumps(self.players)
+        for client in self.clients:
+            client.sendLine(self.players)
+        print self.clients
 
-class ChatFactory(Factory):
+class BlackFactory(Factory):
     def __init__(self):
         self.players = []
+        self.clients = []
 
     def buildProtocol(self, addr):
-        return Chat(self.players) 
+        return Game_Data(self.players, self.clients) 
 
 
-reactor.listenTCP(6000, ChatFactory())
+reactor.listenTCP(6000, BlackFactory())
 reactor.run()
 
