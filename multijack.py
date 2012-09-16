@@ -22,20 +22,20 @@ class Deal(Shuffle):
         self.dealer = self.deck.pop(0) + self.deck.pop(1)       
 
 
-class ChatClientProtocol(LineReceiver):
+class BlackClientProtocol(LineReceiver):
     def __init__(self, recv):
         self.recv = recv
 
     def lineReceived(self, line):
         self.recv(line)
+        print line
 
-class ChatClient(ClientFactory):
+class BlackClient(ClientFactory):
     def __init__(self, recv):
-        self.protocol = ChatClientProtocol
         self.recv = recv
 
     def buildProtocol(self, addr):
-        return ChatClientProtocol(self.recv)
+        return BlackClientProtocol(self.recv)
 
 class Take(Shuffle):
     def card(self):
@@ -104,7 +104,6 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
-        print self.line
 
     def tick(self):
         flag = 0
@@ -237,5 +236,5 @@ if __name__ == '__main__':
 
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('192.168.1.2', 6000, ChatClient(c.new_line))
+    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c.new_line))
     reactor.run()
