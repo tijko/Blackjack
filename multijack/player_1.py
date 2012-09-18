@@ -22,21 +22,6 @@ class Deal(Shuffle):
         self.dealer = self.deck.pop(0) + self.deck.pop(1)       
 
 
-class BlackClientProtocol(LineReceiver):
-    def __init__(self, recv):
-        self.recv = recv
-
-    def lineReceived(self, line):
-        self.recv(line)
-        print line
-
-class BlackClient(ClientFactory):
-    def __init__(self, recv):
-        self.recv = recv
-
-    def buildProtocol(self, addr):
-        return BlackClientProtocol(self.recv)
-
 class Take(Shuffle):
     def card(self):
         Shuffle.__init__(self)
@@ -104,6 +89,9 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
+    
+    def sendLine(self, line):
+        pass
 
     def tick(self):
         flag = 0
@@ -162,6 +150,7 @@ class Client(object):
                         pygame.display.flip()
                         flag += 1        
                 if self.deal_rect.collidepoint(pos):
+                    allhands = []
                     flag = 0
                     self.__init__()
                     deal = Deal()
@@ -188,6 +177,10 @@ class Client(object):
                             spot_x += 230
                             spot_y -= 80
                         seat += 1
+                        allhands.append(player_hand)
+                    allhands = simplejson.dumps(allhands)
+                    self.sendLine(allhands)
+## pack up dealer and send over ##
                     edge = pygame.image.load('Pictures/cards/edge.png').convert()
                     self.screen.blit(edge,(332,100))
                     dealer_hand = []
@@ -231,10 +224,32 @@ class Client(object):
                         flag += 1
                     pygame.display.flip()
 
+
+class BlackClientProtocol(LineReceiver):
+    def __init__(self, recv):
+        self.recv = recv
+
+    def lineReceived(self, line):
+        self.recv(line)
+        print line
+
+    def connectionMade(self):
+        self.host = self
+        print self.host
+
+class BlackClient(ClientFactory):
+    def __init__(self, client):
+        self.client = client
+
+    def buildProtocol(self, addr):
+        proto = BlackClientProtocol(self.client.new_line)
+        self.client.sendLine = proto.sendLine
+        return proto
+
+
 if __name__ == '__main__':
     c = Client()
-
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c.new_line))
+    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
     reactor.run()
