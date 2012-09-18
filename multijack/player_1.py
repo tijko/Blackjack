@@ -233,10 +233,6 @@ class BlackClientProtocol(LineReceiver):
         self.recv(line)
         print line
 
-    def connectionMade(self):
-        self.host = self
-        print self.host
-
 class BlackClient(ClientFactory):
     def __init__(self, client):
         self.client = client
