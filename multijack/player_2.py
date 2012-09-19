@@ -196,9 +196,9 @@ class BlackClientProtocol(LineReceiver):
             pass
         else:
             line = simplejson.loads(line)
-            for i in line:
-                for v in i:
-                    out = pygame.image.load(('Pictures/cards/') + v).convert()
+            for hand in line:
+                for card in hand:
+                    out = pygame.image.load(('Pictures/cards/') + card).convert()
                     client.screen.blit(out,(spot_x,spot_y))
                     spot_x += 30
                 if seat < 1:
