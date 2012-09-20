@@ -78,7 +78,44 @@ class Client(object):
 
     def new_line(self, line):
         self.line = line
-        self.line = simplejson.loads(self.line)
+        dspot_x = 260
+        spot_x = 50
+        spot_y = 240
+        seat = 0
+        if 'turn1' in self.line:
+            self.line = ''
+        if 'player' in self.line:
+            pass
+        if 'edge' in self.line:
+            self.line = simplejson.loads(self.line)
+            for i in self.line:
+                if 'png' not in i:
+                    edge = pygame.image.load('Pictures/cards/edge.png').convert()
+                    self.screen.blit(edge,(332,100))
+                if 'png' in i:
+                    out = pygame.image.load(('Pictures/cards/') + i)
+                    self.screen.blit(out,(dspot_x,100))
+                    dspot_x += 30
+        if 'png' in self.line and 'edge' not in self.line:
+            self.line = simplejson.loads(self.line)
+            print self.line
+            for i in self.line:
+                for v in i:
+                    out = pygame.image.load(('Pictures/cards/') + v).convert()
+                    self.screen.blit(out,(spot_x,spot_y))
+                    spot_x += 30
+                if seat < 1:
+                    spot_x += 180
+                    spot_y += 120
+                if seat == 1:
+                    spot_x += 230
+                    spot_y -= 80
+                seat += 1
+        print self.line
+        pygame.display.flip()
+
+    def sendLine(self, line):
+        pass
 
     def tick(self):
         flag = 0
@@ -187,42 +224,22 @@ class BlackClientProtocol(LineReceiver):
         self.recv = recv
 
     def lineReceived(self, line):
-        client = Client()
-        spot_x = 50
-        spot_y = 240
-        seat = 0
         self.recv(line)
-        if 'turn1' in line:
-            line = ''
-        if 'player' in line:
-            pass
-        if 'png' in line:
-            line = simplejson.loads(line)
-            for i in line:
-                for v in i:
-                    out = pygame.image.load(('Pictures/cards/') + v).convert()
-                    client.screen.blit(out,(spot_x,spot_y))
-                    spot_x += 30
-                if seat < 1:
-                    spot_x += 180
-                    spot_y += 120
-                if seat == 1:
-                    spot_x += 230
-                    spot_y -= 80
-                seat += 1
-        print line
-        pygame.display.flip()
+        print line    
+  
 
 class BlackClient(ClientFactory):
-    def __init__(self, recv):
-        self.recv = recv
+    def __init__(self, client):
+        self.client = client
 
     def buildProtocol(self, addr):
-        return BlackClientProtocol(self.recv)
+        proto = BlackClientProtocol(self.client.new_line)
+        self.client.sendLine = proto.sendLine
+        return proto
 
 if __name__ == '__main__':
     c = Client()
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c.new_line))
+    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
     reactor.run()
