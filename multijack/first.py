@@ -89,7 +89,7 @@ class Client(object):
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if self.stand_rect.collidepoint(pos) and flag < 1:
+                if self.stand_rect.collidepoint(pos) and flag < 1 and self.line == 'turn1':
                     draw = dealer_cards[2] + dealer_cards[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     self.screen.blit(out,(dspot_x,100))
@@ -169,7 +169,7 @@ class Client(object):
 #                        pygame.display.flip()
 #                        flag += 1
 
-                if self.hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1:
+                if self.hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1 and self.line == 'turn1':
                     new_card = Take().card()
                     player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
@@ -192,13 +192,15 @@ class BlackClientProtocol(LineReceiver):
         spot_y = 240
         seat = 0
         self.recv(line)
+        if 'turn1' in line:
+            line = ''
         if 'player' in line:
             pass
-        else:
+        if 'png' in line:
             line = simplejson.loads(line)
-            for hand in line:
-                for card in hand:
-                    out = pygame.image.load(('Pictures/cards/') + card).convert()
+            for i in line:
+                for v in i:
+                    out = pygame.image.load(('Pictures/cards/') + v).convert()
                     client.screen.blit(out,(spot_x,spot_y))
                     spot_x += 30
                 if seat < 1:
