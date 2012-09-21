@@ -55,6 +55,9 @@ class Hold(Total):
 class Client(object):
     def __init__(self):
         pygame.init()
+        self.card1_spot = 640
+        self.card2_spot = 350
+        self.turn = 0
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
@@ -93,14 +96,18 @@ class Client(object):
             for i in self.line:
                 if 'png' in i:
                     out = pygame.image.load(('Pictures/cards/') + i).convert()
-                    self.screen.blit(out,(640,280))
+                    self.screen.blit(out,(self.card1_spot,280))
+                    self.card1_spot += 30
                     pygame.display.flip()
         if 'card2' in self.line:
             for i in self.line:
                 if 'png' in i:
                     out = pygame.image.load(('Pictures/cards/') + i).convert()
-                    self.screen.blit(out,(350,360))
+                    self.screen.blit(out,(self.card2_spot,360))
+                    self.card2_spot += 30
                     pygame.display.flip()
+        if 'turn3' in self.line:
+            self.turn = 1
     
     def sendLine(self, line):
         pass
@@ -114,7 +121,8 @@ class Client(object):
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if self.stand_rect.collidepoint(pos) and flag < 1 and line == 'turn3':
+## 'dealer_cards' not recognized  ** fix-it ** ##
+                if self.stand_rect.collidepoint(pos) and flag < 1 and self.turn == 1:
                     draw = dealer_cards[2] + dealer_cards[3] + '.png'
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
                     self.screen.blit(out,(dspot_x,100))
@@ -238,7 +246,7 @@ class Client(object):
                         self.screen.blit(self.tie,(230,200))
                         pygame.display.flip()
                         flag += 1
-                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and flag < 1 and self.line == 'turn3':
+                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and flag < 1 and self.turn >= 1:
                     new_card = Take().card()
                     self.player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
@@ -246,6 +254,9 @@ class Client(object):
                     self.screen.blit(out,(self.spot_x,240))
                     self.player_amount = Total().tally(self.player_score)
                     self.spot_x += 30
+                    card = ['card3', draw]
+                    card = simplejson.dumps(card)
+                    self.sendLine(card)
                     if self.player_amount > 21:
                         self.screen.blit(self.bust,(200,200))
                         flag += 1
