@@ -48,6 +48,8 @@ class Hold(Total):
 class Client(object):
     def __init__(self):
         pygame.init()
+        self.flag = 0
+        self.spot_x = 640
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
@@ -82,8 +84,9 @@ class Client(object):
         spot_x = 50
         spot_y = 240
         seat = 0
+        self.turn = 0
         if 'turn1' in self.line:
-            self.line = ''
+            self.turn += 1 
         if 'player' in self.line:
             pass
         if 'edge' in self.line:
@@ -96,9 +99,8 @@ class Client(object):
                     out = pygame.image.load(('Pictures/cards/') + i)
                     self.screen.blit(out,(dspot_x,100))
                     dspot_x += 30
-        if 'png' in self.line and 'edge' not in self.line:
+        if 'png' in self.line and 'edge' not in self.line and 'card1' not in self.line and 'card2' not in self.line:
             self.line = simplejson.loads(self.line)
-            print self.line
             for i in self.line:
                 for v in i:
                     out = pygame.image.load(('Pictures/cards/') + v).convert()
@@ -111,14 +113,23 @@ class Client(object):
                     spot_x += 230
                     spot_y -= 80
                 seat += 1
-        print self.line
+        if 'first' in self.line:
+            self.line = simplejson.loads(self.line)
+            self.score = self.line
+            self.player_amount = Total().tally(self.line)
+        if 'card2' in self.line:
+            self.line = simplejson.loads(self.line)
+            for i in self.line:
+                if 'png' in i:
+                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    self.screen.blit(out,(350,360))
+                    pygame.display.flip()
         pygame.display.flip()
 
     def sendLine(self, line):
         pass
 
     def tick(self):
-        flag = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -126,97 +137,29 @@ class Client(object):
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if self.stand_rect.collidepoint(pos) and flag < 1 and self.line == 'turn1':
-                    draw = dealer_cards[2] + dealer_cards[3] + '.png'
-                    out = pygame.image.load(('Pictures/cards/') + draw).convert()
-                    self.screen.blit(out,(dspot_x,100))
-                    pygame.display.flip()
-                    dspot_x += 30
-                    if dealer_amount == 21:
-                        self.screen.blit(self.dealer_blackjack,(230,200))
-                        pygame.display.flip()
-                        flag += 1
-                    if dealer_amount > 16 and dealer_amount < player_amount and flag < 1:
-                        self.screen.blit(self.player_wins,(250,200))
-                        pygame.display.flip()
-                        flag += 1
-                    if dealer_amount > 16 and dealer_amount > player_amount and flag < 1:
-                        self.screen.blit(self.dealer_wins,(260,200))
-                        pygame.display.flip()
-                        flag += 1
-                    if dealer_amount > 16 and dealer_amount == player_amount and flag < 1:
-                        self.screen.blit(tie,(250,200))
-                        pygame.display.flip()
-                        flag += 1
-                    while dealer_amount < 17:                    
-                        new = Hold().dealer_hit(dealer_score)
-                        draw = new[0] + new[1] + '.png'
-                        out = pygame.image.load(('Pictures/cards/') + draw).convert()
-                        self.screen.blit(out,(dspot_x,100))
-                        dspot_x += 30
-                        pygame.display.flip()
-                        dealer_score.append(new[1])
-                        dealer_amount = Total().tally(dealer_score)
-                    if dealer_amount > 21 and flag < 1:
-                        self.screen.blit(self.player_wins,(250,200))
-                        pygame.display.flip()
-                        flag += 1      
-                    if player_amount > dealer_amount and player_amount < 22 and flag < 1:
-                        self.screen.blit(self.player_wins,(250,200))
-                        pygame.display.flip()
-                        flag += 1
-                    if player_amount < dealer_amount and dealer_amount < 22 and flag < 1:
-                        self.screen.blit(self.dealer_wins,(260,200))
-                        pygame.display.flip()
-                        flag += 1
-                    elif dealer_amount == player_amount and flag < 1:
-                        self.screen.blit(self.tie,(250,200))
-                        pygame.display.flip()
-                        flag += 1        
+                if self.stand_rect.collidepoint(pos) and self.flag < 1 and self.turn == 1:
+                    turn = 'turn2'
+                    turn = simplejson.dumps(turn)
+                    self.sendLine(turn)
+                    self.flag += 1
 
-#                    edge = pygame.image.load('Pictures/cards/edge.png').convert()
-#                    self.screen.blit(edge,(332,100))
-#                    dealer_hand = []
-#                    dealer_hand.append(deal.dealer[0]+deal.dealer[1]+'.png')
-#                    dspot_x = 260
-
-#                    for i in dealer_hand:
-#                        out = pygame.image.load(('Pictures/cards/') + i).convert()
-#                        self.screen.blit(out,(dspot_x,100))
-#                        dspot_x += 30
-#                    pygame.display.flip()
-#                    player_score = [deal.player[1], deal.player[3]]
-#                    dealer_score = [deal.dealer[1], deal.dealer[3]]
-#                    player_amount = Total().tally(player_score)
-#                    dealer_amount = Total().tally(dealer_score)
-#                    if player_amount == 21 and dealer_amount != 21:
-#                        draw = deal.dealer[2] + deal.dealer[3] + '.png'
-#                        out = pygame.image.load(('Pictures/cards/') + draw).convert()
-#                        self.screen.blit(out,(dspot_x,100))
-#                        dspot_x += 30
-#                        self.screen.blit(self.player_blackjack,(230,200))
-#                        pygame.display.flip()
-#                        flag += 1
-#                    if player_amount == 21 and dealer_amount == 21:
-#                        draw = deal.dealer[2] + deal.dealer[3] + '.png'
-#                        out = pygame.image.load(('Pictures/cards/') + draw).convert()
-#                        self.screen.blit(out,(dspot_x,100))
-#                        dspot_x += 30 
-#                        self.screen.blit(self.tie,(230,200))
-#                        pygame.display.flip()
-#                        flag += 1
-
-                if self.hit_rect.collidepoint(pos) and player_amount < 21 and flag < 1 and self.line == 'turn1':
+                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and self.turn >= 1:
                     new_card = Take().card()
-                    player_score.append(new_card[1])
+                    self.score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
-                    self.screen.blit(out,(spot_x,240))
-                    player_amount = Total().tally(player_score)
-                    spot_x += 30
-                    if player_amount > 21:
+                    self.screen.blit(out,(self.spot_x,280))
+                    self.player_amount = Total().tally(self.score)
+                    self.spot_x += 30
+                    card = ['card1',draw]
+                    card = simplejson.dumps(card)
+                    self.sendLine(card)
+                    if self.player_amount > 21:
                         self.screen.blit(self.bust,(200,200))
-                        flag += 1
+                        self.flag += 1
+                        turn = 'turn2'
+                        turn = simplejson.dumps(turn)
+                        self.sendLine(turn)
                     pygame.display.flip()
 
 class BlackClientProtocol(LineReceiver):
