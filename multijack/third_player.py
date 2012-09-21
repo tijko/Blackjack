@@ -86,11 +86,21 @@ class Client(object):
         pygame.display.flip()
         reactor.callLater(0.1, self.tick)
 
-## start sending 'turn + a number i.e. turn1 -- turn2 etc ##
-
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
+        if 'card1' in self.line:
+            for i in self.line:
+                if 'png' in i:
+                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    self.screen.blit(out,(640,280))
+                    pygame.display.flip()
+        if 'card2' in self.line:
+            for i in self.line:
+                if 'png' in i:
+                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    self.screen.blit(out,(350,360))
+                    pygame.display.flip()
     
     def sendLine(self, line):
         pass
@@ -179,14 +189,19 @@ class Client(object):
                         if seat == 1:
                             self.spot_x += 230
                             spot_y -= 80
+                            second = [i for i in fresh_hand]
+                            second.append('second')
+                            second = simplejson.dumps(second)
+                            self.sendLine(second)
+                        if seat == 2:
+                            first = [i for i in fresh_hand]
+                            first.append('first')
+                            first = simplejson.dumps(first)
+                            self.sendLine(first)
                         seat += 1
                         allhands.append(player_hand)
                     allhands = simplejson.dumps(allhands)
                     self.sendLine(allhands)
-#                    turn = 'turn1'
-#                    turn = simplejson.dumps(turn)
-#                    self.sendLine(turn)
-## pack up dealer and send over ##
                     edge = pygame.image.load('Pictures/cards/edge.png').convert()
                     self.screen.blit(edge,(332,100))
                     dealer_hand = []
@@ -204,6 +219,9 @@ class Client(object):
                     dealer_send = dealer_hand.append('edge')
                     dealer_send = simplejson.dumps(dealer_hand)
                     self.sendLine(dealer_send)
+                    turn = 'turn1'
+                    turn = simplejson.dumps(turn)
+                    self.sendLine(turn)
                     if self.player_amount == 21 and dealer_amount != 21:
                         draw = deal.dealer[2] + deal.dealer[3] + '.png'
                         out = pygame.image.load(('Pictures/cards/') + draw).convert()
@@ -228,7 +246,6 @@ class Client(object):
                     self.screen.blit(out,(self.spot_x,240))
                     self.player_amount = Total().tally(self.player_score)
                     self.spot_x += 30
-## on bust send over switch_player flag ##
                     if self.player_amount > 21:
                         self.screen.blit(self.bust,(200,200))
                         flag += 1
