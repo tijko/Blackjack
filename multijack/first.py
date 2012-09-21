@@ -48,6 +48,9 @@ class Hold(Total):
 class Client(object):
     def __init__(self):
         pygame.init()
+        self.card2_spot = 350
+        self.card3_spot = 110
+        self.turn = 0
         self.flag = 0
         self.spot_x = 640
         self.screen = pygame.display.set_mode((800, 600))
@@ -84,7 +87,6 @@ class Client(object):
         spot_x = 50
         spot_y = 240
         seat = 0
-        self.turn = 0
         if 'turn1' in self.line:
             self.turn += 1 
         if 'player' in self.line:
@@ -99,7 +101,7 @@ class Client(object):
                     out = pygame.image.load(('Pictures/cards/') + i)
                     self.screen.blit(out,(dspot_x,100))
                     dspot_x += 30
-        if 'png' in self.line and 'edge' not in self.line and 'card1' not in self.line and 'card2' not in self.line:
+        if 'png' in self.line and 'edge' not in self.line and 'card1' not in self.line and 'card2' not in self.line and 'card3' not in self.line:
             self.line = simplejson.loads(self.line)
             for i in self.line:
                 for v in i:
@@ -117,12 +119,27 @@ class Client(object):
             self.line = simplejson.loads(self.line)
             self.score = self.line
             self.player_amount = Total().tally(self.line)
+            if self.player_amount == 21:
+                self.screen.blit(self.player_blackjack,(230,200))
+                pygame.display.flip()
+                turn = 'turn2'
+                turn = simplejson.dumps(turn)
+                self.sendLine(turn)
         if 'card2' in self.line:
             self.line = simplejson.loads(self.line)
             for i in self.line:
                 if 'png' in i:
                     out = pygame.image.load(('Pictures/cards/') + i).convert()
-                    self.screen.blit(out,(350,360))
+                    self.screen.blit(out,(self.card2_spot,360))
+                    self.card2_spot += 30
+                    pygame.display.flip()
+        if 'card3' in self.line:
+            self.line = simplejson.loads(self.line)
+            for i in self.line:
+                if 'png' in i:
+                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    self.screen.blit(out,(self.card3_spot,240))
+                    self.card3_spot += 30
                     pygame.display.flip()
         pygame.display.flip()
 
@@ -142,8 +159,9 @@ class Client(object):
                     turn = simplejson.dumps(turn)
                     self.sendLine(turn)
                     self.flag += 1
+                    self.turn = 0
 
-                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and self.turn >= 1:
+                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and self.turn == 1:
                     new_card = Take().card()
                     self.score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
