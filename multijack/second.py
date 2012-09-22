@@ -139,7 +139,6 @@ class Client(object):
                     out = pygame.image.load(('Pictures/cards/') + i).convert()
                     self.screen.blit(out,(self.card1_spot,280))
                     self.card1_spot += 30
-                    pygame.display.flip()
         if 'card3' in self.line:
             self.line = simplejson.loads(self.line)
             for i in self.line:
@@ -147,7 +146,19 @@ class Client(object):
                     out = pygame.image.load(('Pictures/cards/') + i).convert()
                     self.screen.blit(out,(self.card3_spot,240))
                     self.card3_spot += 30
-                    pygame.display.flip()
+        if 'score' in self.line and self.player_amount < 22:
+            self.line = simplejson.loads(self.line)
+            for i in self.line:
+                if isinstance(i,int):
+                    if self.player_amount == i:
+                        self.screen.blit(self.tie,(250,200))
+                    if self.player_amount < i and i < 22:
+                        self.screen.blit(self.dealer_wins,(260,200))
+                    if i > 21:
+                        self.screen.blit(self.player_wins,(250,200))
+                    if self.player_amount > i:
+                        self.screen.blit(self.player_wins,(250,200))
+                    
         pygame.display.flip()
     
     def sendLine(self):
