@@ -37,8 +37,11 @@ class Total(Shuffle):
             if self.cards.has_key(i):
                 self.amount += self.cards[i] 
         if self.amount > 21 and 'ace' in score:
-            deduct = score.count('ace') * 10
-            self.amount -= deduct 
+            if score.count('ace') > 1:
+                deduct = (score.count('ace') - 1) * 10
+                self.amount -= deduct 
+            else:
+                self.amount -= 10
         return self.amount
 
 class Hold(Total):
@@ -143,7 +146,6 @@ class Client(object):
                 self.dspot_x += 30 
                 self.screen.blit(self.tie,(230,200))
                 self.turn = 0
-              ## still need to signal just BJ or '21'
                 score = ['score',self.dealer_amount]
                 score = simplejson.dumps(score)
                 self.sendLine(score)
@@ -192,7 +194,7 @@ class Client(object):
                         self.screen.blit(self.player_wins,(250,200))
                     if self.player_amount > self.dealer_amount and self.player_amount < 22:
                         self.screen.blit(self.player_wins,(250,200))
-                    if self.player_amount < self.dealer_amount and self.dealer_amount < 21:
+                    if self.player_amount < self.dealer_amount and self.dealer_amount < 22:
                         self.screen.blit(self.dealer_wins,(260,200))
                     elif self.dealer_amount == self.player_amount:
                         self.screen.blit(self.tie,(250,200))
