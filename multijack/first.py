@@ -87,6 +87,8 @@ class Client(object):
         spot_x = 50
         spot_y = 240
         seat = 0
+        if 'deal' in self.line:
+            self.__init__()
         if 'turn1' in self.line:
             self.turn += 1 
         if 'player' in self.line:
@@ -101,6 +103,9 @@ class Client(object):
                     out = pygame.image.load(('Pictures/cards/') + i)
                     self.screen.blit(out,(dspot_x,100))
                     dspot_x += 30
+        ## accept dealer_score and compare for results ##
+        ## accept and blit dealer here ##
+        ## might put in more here to exclude 'dealer' ##
         if 'png' in self.line and 'edge' not in self.line and 'card1' not in self.line and 'card2' not in self.line and 'card3' not in self.line:
             self.line = simplejson.loads(self.line)
             for i in self.line:
@@ -120,8 +125,7 @@ class Client(object):
             self.score = self.line
             self.player_amount = Total().tally(self.line)
             if self.player_amount == 21:
-                self.screen.blit(self.player_blackjack,(230,200))
-                pygame.display.flip()
+                self.turn = 0
                 turn = 'turn2'
                 turn = simplejson.dumps(turn)
                 self.sendLine(turn)
