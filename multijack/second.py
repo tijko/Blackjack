@@ -49,6 +49,7 @@ class Client(object):
     def __init__(self):
         self.flag = 0
         pygame.init()
+        self.spot_x = 350
         self.card1_spot = 640
         self.card3_spot = 110
         self.turn = 0
@@ -82,11 +83,12 @@ class Client(object):
 
     def new_line(self, line):
         self.line = line
-        self.spot_x = 350
         spot_x = 50
         spot_y = 240
         seat = 0
         dspot_x = 260
+        if 'deal' in self.line:
+            self.__init__()
         if 'turn2' in self.line:
             self.turn += 1 
         if 'player' in line:
@@ -120,7 +122,7 @@ class Client(object):
             self.score = self.line
             self.player_amount = Total().tally(self.line)
             if self.player_amount == 21:
-                self.screen.blit(self.player_blackjack(230,200))
+                self.turn = 0
                 turn = 'turn3'
                 turn = simplejson.dumps(turn)
                 self.sendLine(turn)
@@ -163,9 +165,8 @@ class Client(object):
                     self.score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
                     out = pygame.image.load(('Pictures/cards/') + draw).convert()
-                ## this isn't working right // card was covering, now too spread ##
-                    self.spot_x += 30
                     self.screen.blit(out,(self.spot_x,360))
+                    self.spot_x += 30
                     player_amount = Total().tally(self.score)
                     card = ['card2', draw]
                     card = simplejson.dumps(card)
