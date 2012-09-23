@@ -37,11 +37,9 @@ class Total(Shuffle):
             if self.cards.has_key(i):
                 self.amount += self.cards[i] 
         if self.amount > 21 and 'ace' in score:
-            if score.count('ace') > 1:
-                deduct = (score.count('ace') - 1) * 10
-                self.amount -= deduct 
-            else:
-                self.amount -= 10
+            for i in range(score.count('ace')):
+                if self.amount > 21:
+                    self.amount -= 10
         return self.amount
 
 class Hold(Total):
