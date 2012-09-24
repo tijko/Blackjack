@@ -54,6 +54,8 @@ class Client(object):
         self.card3_spot = 110
         self.dspot_x = 260
         self.turn = 0
+        self.bj_count = 0
+        self.player_bj = 0
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
@@ -91,6 +93,12 @@ class Client(object):
             self.__init__()
         if 'turn2' in self.line:
             self.turn += 1 
+            if self.player_amount == 21:
+                self.player_bj += 1
+                self.turn = 0
+                turn = 'turn3'
+                turn = simplejson.dumps(turn)
+                self.sendLine(turn)
         if 'player' in line:
             pass
         if 'edge' in line:
@@ -107,6 +115,7 @@ class Client(object):
             self.line = simplejson.loads(self.line)
             for i in self.line:
                 if 'png' in i:
+                    self.bj_count += 1
                     out = pygame.image.load(('Pictures/cards/') + i)
                     self.screen.blit(out,(self.dspot_x,100))
                     self.dspot_x += 30
@@ -128,11 +137,6 @@ class Client(object):
             self.line = simplejson.loads(self.line)
             self.score = self.line
             self.player_amount = Total().tally(self.line)
-            if self.player_amount == 21:
-                self.turn = 0
-                turn = 'turn3'
-                turn = simplejson.dumps(turn)
-                self.sendLine(turn)
         if 'card1' in self.line:
             self.line = simplejson.loads(self.line)
             for i in self.line:
@@ -151,13 +155,27 @@ class Client(object):
             self.line = simplejson.loads(self.line)
             for i in self.line:
                 if isinstance(i,int):
-                    if self.player_amount == i:
+                    if self.player_amount == i and self.bj_count != 1 and self.player_bj != 1:
                         self.screen.blit(self.tie,(250,200))
-                    if self.player_amount < i and i < 22:
+                    if self.player_bj != 1 and self.bj_count == 1 and i == 21:
+                        self.screen.blit(self.dealer_blackjack,(230,200))
+                    if self.player_bj == 1 and self.bj_count == 1 and i < 21:
+                        self.screen.blit(self.player_blackjack,(230,200))
+                    if self.player_bj == 1 and self.bj_count != 1:
+                        self.screen.blit(self.player_blackjack,(230,200))
+                    if self.player_bj == 1 and self.bj_count == 1 and i == 21:
+                        self.screen.blit(self.tie,(250,200))
+                    if self.player_amount < i and i < 22 and self.bj_count != 1:
                         self.screen.blit(self.dealer_wins,(260,200))
-                    if i > 21:
+                    if self.bj_count == 1 and i < 21 and i > self.player_amount:
+                        self.screen.blit(self.dealer_wins,(260,200))
+                    if self.bj_count == 1 and i < 21 and self.player_amount == i:
+                        self.screen.blit(self.tie,(250,200))
+                    if i > 21 and self.player_bj == 1:
+                        self.screen.blit(self.player_blackjack,(230,200))
+                    if i > 21 and self.player_bj != 1:
                         self.screen.blit(self.player_wins,(250,200))
-                    if self.player_amount > i:
+                    if self.player_amount > i and self.player_bj != 1 and self.player_bj != 1:
                         self.screen.blit(self.player_wins,(250,200))
                     
         pygame.display.flip()
