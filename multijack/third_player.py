@@ -123,6 +123,7 @@ class Client(object):
                 dh = ['dh', draw]
                 dh = simplejson.dumps(dh)
                 self.sendLine(dh)
+## check for strange behavior
                 while self.dealer_amount < 17:                    
                     new = Hold().dealer_hit(self.dealer_score)
                     draw = new[0] + new[1] + '.png'
@@ -188,14 +189,14 @@ class Client(object):
                         self.sendLine(dh)
                         self.dealer_score.append(new[1])
                         self.dealer_amount = Total().tally(self.dealer_score)
-                    if self.dealer_amount > 21:
-                        self.screen.blit(self.player_wins,(250,200))
-                    if self.player_amount > self.dealer_amount and self.player_amount < 22:
-                        self.screen.blit(self.player_wins,(250,200))
-                    if self.player_amount < self.dealer_amount and self.dealer_amount < 22:
-                        self.screen.blit(self.dealer_wins,(260,200))
-                    elif self.dealer_amount == self.player_amount:
-                        self.screen.blit(self.tie,(250,200))
+                        if self.dealer_amount > 21:
+                            self.screen.blit(self.player_wins,(250,200))
+                        if self.player_amount > self.dealer_amount and self.player_amount < 22 and self.dealer_amount > 16:
+                            self.screen.blit(self.player_wins,(250,200))
+                        if self.player_amount < self.dealer_amount and self.dealer_amount < 22 and self.dealer_amount > 16:
+                            self.screen.blit(self.dealer_wins,(260,200))
+                        elif self.dealer_amount == self.player_amount and self.dealer_amount > 16:
+                            self.screen.blit(self.tie,(250,200))
                     score = ['score',self.dealer_amount]
                     score = simplejson.dumps(score)
                     self.sendLine(score)
