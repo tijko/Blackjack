@@ -17,14 +17,12 @@ class Shuffle(object):
 
 class Take(Shuffle):
     def card(self):
-        Shuffle.__init__(self)
         self.card = self.deck[0]
         self.deck.pop(0) 
         return self.card
 
 class Total(Shuffle):
     def tally(self,score):
-        Shuffle.__init__(self)
         self.amount = 0
         for i in score:
             if self.cards.has_key(i):
@@ -37,7 +35,6 @@ class Total(Shuffle):
 
 class Hold(Total):
     def dealer_hit(self,score):
-        Total.__init__(self)
         comp = self.tally(score)
         if comp > 16:
             return    
