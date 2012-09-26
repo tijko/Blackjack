@@ -24,14 +24,12 @@ class Deal(Shuffle):
 
 class Take(Shuffle):
     def card(self):
-        Shuffle.__init__(self)
         self.card = self.deck[0]
         self.deck.pop(0) 
         return self.card
 
 class Total(Shuffle):
     def tally(self,score):
-        Shuffle.__init__(self)
         self.amount = 0
         for i in score:
             if self.cards.has_key(i):
@@ -44,7 +42,6 @@ class Total(Shuffle):
 
 class Hold(Total):
     def dealer_hit(self,score):
-        Total.__init__(self)
         comp = self.tally(score)
         if comp > 16:
             return    
@@ -59,6 +56,7 @@ class Client(object):
         self.card1_spot = 640
         self.card2_spot = 350
         self.turn = 0
+        self.bj = 0
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
@@ -123,7 +121,6 @@ class Client(object):
                 dh = ['dh', draw]
                 dh = simplejson.dumps(dh)
                 self.sendLine(dh)
-## check for strange behavior
                 while self.dealer_amount < 17:                    
                     new = Hold().dealer_hit(self.dealer_score)
                     draw = new[0] + new[1] + '.png'
@@ -172,11 +169,12 @@ class Client(object):
                     self.sendLine(dh)
                     if self.dealer_amount == 21:
                         self.screen.blit(self.dealer_blackjack,(230,200))
+                        self.bj += 1
                     if self.dealer_amount > 16 and self.dealer_amount < self.player_amount:
                         self.screen.blit(self.player_wins,(250,200))
                     if self.dealer_amount > 16 and self.dealer_amount > self.player_amount and self.dealer_amount != 21:
                         self.screen.blit(self.dealer_wins,(260,200))
-                    if self.dealer_amount > 16 and self.dealer_amount == self.player_amount:
+                    if self.dealer_amount > 16 and self.dealer_amount == self.player_amount and self.bj != 1:
                         self.screen.blit(self.tie,(250,200))
                     while self.dealer_amount < 17:                    
                         new = Hold().dealer_hit(self.dealer_score)
