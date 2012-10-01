@@ -1,25 +1,31 @@
 import simplejson
-import pygame
 import random
 import itertools
+
+import pygame
+
 from twisted.internet import reactor
-from twisted.internet.protocol import Protocol, ClientFactory
+from twisted.internet.protocol import Protocol
+from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.task import LoopingCall
 
 class Shuffle(object):
     def __init__(self):
         self.suits = ['heart','diamond','spade','club'] * 13
-        self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
+        self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,
+                      'eight':8,'nine':9,'ten':10,'jack':10,'queen':10,'king':10,'ace':11}
         self.deck = list(itertools.izip(self.suits,self.cards.keys() * 4)) * 6
         random.shuffle(self.deck)
         return
+
 
 class Take(Shuffle):
     def card(self):
         self.card = self.deck[0]
         self.deck.pop(0) 
         return self.card
+
 
 class Total(Shuffle):
     def tally(self,score):
@@ -33,6 +39,7 @@ class Total(Shuffle):
                     self.amount -= 10
         return self.amount
 
+
 class Hold(Total):
     def dealer_hit(self,score):
         comp = self.tally(score)
@@ -42,6 +49,7 @@ class Hold(Total):
             self.card = self.deck[0]
             self.deck.pop(0)
             return self.card
+
 
 class Client(object):
     def __init__(self):
@@ -218,6 +226,7 @@ class Client(object):
                         self.sendLine(turn)
                     pygame.display.flip()
 
+
 class BlackClientProtocol(LineReceiver):
     def __init__(self, recv):
         self.recv = recv
@@ -236,9 +245,12 @@ class BlackClient(ClientFactory):
         self.client.sendLine = proto.sendLine
         return proto
 
+
 if __name__ == '__main__':
     c = Client()
     lc = LoopingCall(c.tick)
     lc.start(0.1)
     reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
     reactor.run()
+
+
