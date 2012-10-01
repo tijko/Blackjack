@@ -1,7 +1,8 @@
+import simplejson
+
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
-import simplejson
 
 class Game_Data(LineReceiver):
     def __init__(self, players, clients): 
@@ -15,7 +16,13 @@ class Game_Data(LineReceiver):
         self.players = simplejson.dumps(self.players)
         for client in self.clients:
             client.sendLine(self.players)
-        print self.clients
+
+    def lineReceived(self,line):
+        self.line = line
+        print self.line
+        for client in self.clients:
+            client.sendLine(self.line)
+
 
 class BlackFactory(Factory):
     def __init__(self):
