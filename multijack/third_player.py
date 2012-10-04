@@ -12,6 +12,10 @@ from twisted.internet.task import LoopingCall
 
 
 class Shuffle(object):
+    """
+    Class for setting up the deck and 
+    accessing cards.
+    """
     def __init__(self):
         self.suits = ['heart','diamond','spade','club'] * 13
         self.cards = {'deuce':2,'three':3,'four':4,'five':5,'six':6,'seven':7,
@@ -22,6 +26,10 @@ class Shuffle(object):
 
 
 class Deal(Shuffle):
+    """
+    Class that handles passing cards to dealer or
+    player when called.
+    """ 
     def __init__(self):
         Shuffle.__init__(self)
         self.player = self.deck.pop(0) + self.deck.pop(1)
@@ -29,6 +37,10 @@ class Deal(Shuffle):
 
 
 class Take(Shuffle):
+    """
+    Class for 'hit'ing a player/dealer
+    when asked for.
+    """
     def card(self):
         self.card = self.deck[0]
         self.deck.pop(0) 
@@ -36,6 +48,9 @@ class Take(Shuffle):
 
 
 class Total(Shuffle):
+    """
+    Class that will score a hand.
+    """
     def tally(self,score):
         self.amount = 0
         for i in score:
@@ -49,6 +64,10 @@ class Total(Shuffle):
 
 
 class Hold(Total):
+    """
+    Class to call when all players
+    are done taking cards.
+    """
     def dealer_hit(self,score):
         comp = self.tally(score)
         if comp > 16:
@@ -60,6 +79,12 @@ class Hold(Total):
 
 
 class Client(object):
+    """
+    Class to handle setting default screen,
+    to check data received from the server,
+    send data to the server, and handle
+    pygame events.
+    """
     def __init__(self):
         pygame.init()
         self.card1_spot = 640
@@ -311,6 +336,10 @@ class Client(object):
 
 
 class BlackClientProtocol(LineReceiver):
+    """ 
+    Class client for receiving data
+    from the server.
+    """
     def __init__(self, recv):
         self.recv = recv
 
@@ -320,6 +349,10 @@ class BlackClientProtocol(LineReceiver):
 
 
 class BlackClient(ClientFactory):
+    """
+    Class that builds protocol instances
+    to send to the server.
+    """
     def __init__(self, client):
         self.client = client
 
