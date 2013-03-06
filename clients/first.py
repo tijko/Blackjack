@@ -106,7 +106,7 @@ class Client(object):
         self.deal_image = pygame.image.load(os.environ['HOME'] + 
                                             '/Pictures/images/deal.png').convert_alpha()
         self.hit_image = pygame.image.load(os.environ['HOME'] + 
-                                           '/Pictures/cards/hit.png').convert_alpha()
+                                           '/Pictures/images/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
         pygame.display.flip()
