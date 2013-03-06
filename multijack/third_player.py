@@ -106,29 +106,29 @@ class Client(object):
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         # loads images #
-        self.bust = pygame.image.load('Pictures/cards/bust.png').convert_alpha()
-        self.dealer_blackjack = pygame.image.load('Pictures/cards/dealer_blackjack.png').convert_alpha()
-        self.player_blackjack = pygame.image.load('Pictures/cards/player_blackjack.png').convert_alpha()
-        self.dealer_wins = pygame.image.load('Pictures/cards/dealer_wins.png').convert_alpha()
-        self.player_wins = pygame.image.load('Pictures/cards/player_wins.png').convert_alpha()
-        self.tie = pygame.image.load('Pictures/cards/tie.png').convert_alpha()
-        self.stand_image = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
-        self.hit_image = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
+        self.bust = pygame.image.load('/home/haumea/Pictures/cards/bust.png').convert_alpha()
+        self.dealer_blackjack = pygame.image.load('/home/haumea/Pictures/cards/dealer_blackjack.png').convert_alpha()
+        self.player_blackjack = pygame.image.load('/home/haumea/Pictures/cards/player_blackjack.png').convert_alpha()
+        self.dealer_wins = pygame.image.load('/home/haumea/Pictures/cards/dealer_wins.png').convert_alpha()
+        self.player_wins = pygame.image.load('/home/haumea/Pictures/cards/player_wins.png').convert_alpha()
+        self.tie = pygame.image.load('/home/haumea/Pictures/cards/tie.png').convert_alpha()
+        self.stand_image = pygame.image.load('/home/haumea/Pictures/cards/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load('/home/haumea/Pictures/cards/deal.png').convert_alpha()
+        self.hit_image = pygame.image.load('/home/haumea/Pictures/cards/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
-        backdrop = pygame.image.load('Pictures/cards/black.jpg').convert()
+        backdrop = pygame.image.load('/home/haumea/Pictures/cards/black.jpg').convert()
         self.screen.blit(backdrop,(0,0))
-        table = pygame.image.load('Pictures/cards/new.png').convert_alpha()
+        table = pygame.image.load('/home/haumea/Pictures/cards/new.png').convert_alpha()
         self.screen.blit(table,(0,50))
-        banner = pygame.image.load('Pictures/cards/banner.png').convert_alpha()
+        banner = pygame.image.load('/home/haumea/Pictures/cards/banner.png').convert_alpha()
         self.screen.blit(banner,(205,505))
-        decoration = pygame.image.load('Pictures/cards/start.png').convert()
+        decoration = pygame.image.load('/home/haumea/Pictures/cards/start.png').convert()
         self.screen.blit(decoration,(565,150))
-        self.stand_image = pygame.image.load('Pictures/cards/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load('Pictures/cards/deal.png').convert_alpha()
-        self.hit_image = pygame.image.load('Pictures/cards/hit.png').convert_alpha()
+        self.stand_image = pygame.image.load('/home/haumea/Pictures/cards/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load('/home/haumea/Pictures/cards/deal.png').convert_alpha()
+        self.hit_image = pygame.image.load('/home/haumea/Pictures/cards/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
@@ -144,14 +144,14 @@ class Client(object):
             for i in self.line:
                 # blits onto playerone 'spot' #
                 if 'png' in i:
-                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    out = pygame.image.load(('/home/haumea/Pictures/cards/') + i).convert()
                     self.screen.blit(out,(self.card1_spot,280))
                     self.card1_spot += 30
                     pygame.display.flip()
         if 'card2' in self.line:
             for i in self.line:
                 if 'png' in i:
-                    out = pygame.image.load(('Pictures/cards/') + i).convert()
+                    out = pygame.image.load(('/home/haumea/Pictures/cards/') + i).convert()
                     self.screen.blit(out,(self.card2_spot,360))
                     self.card2_spot += 30
                     pygame.display.flip()
@@ -161,13 +161,13 @@ class Client(object):
             # checks for player blackjack #
             if self.player_amount == 21 and self.dealer_amount != 21 and self.turn == 1:
                 draw = self.deal.dealer[2] + self.deal.dealer[3] + '.png'
-                out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                 self.screen.blit(out,(self.dspot_x,100))
                 self.dspot_x += 30
                 self.screen.blit(self.player_blackjack,(230,200))
                 self.turn = 0
                 draw = self.deal.dealer[2] + self.deal.dealer[3] + '.png'
-                out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                 self.screen.blit(out,(self.dspot_x,100))
                 self.dspot_x += 30
                 dh = ['dh', draw]
@@ -177,7 +177,7 @@ class Client(object):
                 while self.dealer_amount < 17:                    
                     new = Hold().dealer_hit(self.dealer_score)
                     draw = new[0] + new[1] + '.png'
-                    out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                    out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                     self.screen.blit(out,(self.dspot_x,100))
                     self.dspot_x += 30
                     dh = ['dh', draw]
@@ -190,7 +190,7 @@ class Client(object):
                 self.sendLine(score)
             if self.player_amount == 21 and self.dealer_amount == 21 and self.turn == 1:
                 draw = self.deal.dealer[2] + self.deal.dealer[3] + '.png'
-                out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                 self.screen.blit(out,(self.dspot_x,100))
                 self.dspot_x += 30 
                 self.screen.blit(self.tie,(230,200))
@@ -218,7 +218,7 @@ class Client(object):
                     self.turn = 0
                     # since this is the last player to act blit dealers cards #
                     draw = self.deal.dealer[2] + self.deal.dealer[3] + '.png'
-                    out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                    out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                     self.screen.blit(out,(self.dspot_x,100))
                     self.dspot_x += 30
                     dh = ['dh', draw]
@@ -238,7 +238,7 @@ class Client(object):
                     while self.dealer_amount < 17:                    
                         new = Hold().dealer_hit(self.dealer_score)
                         draw = new[0] + new[1] + '.png'
-                        out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                        out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                         self.screen.blit(out,(self.dspot_x,100))
                         self.dspot_x += 30
                         dh = ['dh', draw]
@@ -283,7 +283,7 @@ class Client(object):
                         player_hand.append(fresh_hand[suit] + fresh_hand[card] + '.png')
                         player_hand.append(fresh_hand[suit + 2] + fresh_hand[card + 2] + '.png') 
                         for i in player_hand:
-                            out = pygame.image.load(('Pictures/cards/') + i).convert()
+                            out = pygame.image.load(('/home/haumea/Pictures/cards/') + i).convert()
                             self.screen.blit(out,(self.spot_x,spot_y))
                             self.spot_x += 30
                         if seat == 0:
@@ -308,13 +308,13 @@ class Client(object):
                         allhands.append(player_hand)
                     allhands = simplejson.dumps(allhands)
                     self.sendLine(allhands)
-                    edge = pygame.image.load('Pictures/cards/edge.png').convert()
+                    edge = pygame.image.load('/home/haumea/Pictures/cards/edge.png').convert()
                     self.screen.blit(edge,(332,100))
                     dealer_hand = []
                     dealer_hand.append(self.deal.dealer[0] + self.deal.dealer[1] + '.png')
                     self.dspot_x = 260
                     for i in dealer_hand:
-                        out = pygame.image.load(('Pictures/cards/') + i).convert()
+                        out = pygame.image.load(('/home/haumea/Pictures/cards/') + i).convert()
                         self.screen.blit(out,(self.dspot_x,100))
                         self.dspot_x += 30
                     pygame.display.flip()
@@ -334,7 +334,7 @@ class Client(object):
                     new_card = Take().card()
                     self.player_score.append(new_card[1])
                     draw =  new_card[0] + new_card[1] + '.png' 
-                    out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                    out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                     self.screen.blit(out,(self.spot_x,240))
                     self.player_amount = Total().tally(self.player_score)
                     self.spot_x += 30
@@ -346,7 +346,7 @@ class Client(object):
                         self.screen.blit(self.bust,(200,200))
                         self.turn = 0
                         draw = self.deal.dealer[2] + self.deal.dealer[3] + '.png'
-                        out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                        out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                         self.screen.blit(out,(self.dspot_x,100))
                         self.dspot_x += 30
                         dh = ['dh', draw]
@@ -355,7 +355,7 @@ class Client(object):
                         while self.dealer_amount < 17:                    
                             new = Hold().dealer_hit(self.dealer_score)
                             draw = new[0] + new[1] + '.png'
-                            out = pygame.image.load(('Pictures/cards/') + draw).convert()
+                            out = pygame.image.load(('/home/haumea/Pictures/cards/') + draw).convert()
                             self.screen.blit(out,(self.dspot_x,100))
                             self.dspot_x += 30
                             dh = ['dh', draw]
