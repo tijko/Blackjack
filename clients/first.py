@@ -8,8 +8,7 @@ import os
 import pygame
 
 from twisted.internet import reactor
-from twisted.internet.protocol import Protocol
-from twisted.internet.protocol import ClientFactory
+from twisted.internet.protocol import ClientFactory, Protocol
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.task import LoopingCall
 
