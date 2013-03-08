@@ -14,7 +14,7 @@ class Game_Data(LineReceiver):
         self.clients = clients 
 
     def connectionMade(self):
-        new_player = 'player_' + str(len(self.players) + 1)
+        new_player = 'player_' + str(len(self.players[1:]) + 1)
         self.clients.append(self)
         self.players.append(new_player)
         self.players = simplejson.dumps(self.players)
@@ -23,7 +23,7 @@ class Game_Data(LineReceiver):
 
     def lineReceived(self,line):
         self.line = line
-        print self.line
+       # print self.line
         for client in self.clients:
             client.sendLine(self.line)
 
@@ -31,7 +31,7 @@ class Game_Data(LineReceiver):
 class BlackFactory(Factory):
 
     def __init__(self):
-        self.players = []
+        self.players = ['players_list']
         self.clients = []
 
     def buildProtocol(self, addr):
