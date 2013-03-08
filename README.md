@@ -8,3 +8,6 @@ casino rules.
 Each player can be on their own separate computer/device as long as it can run python and 
 connect to your network.
 
+Blackjack uses pygames which you will need to install.
+
+Put the images in your 'Pictures' directory.
