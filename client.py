@@ -110,7 +110,9 @@ class Client(object):
                                   'dh', self.deal.dealer[1] 
                                  ]
                             dh = simplejson.dumps(dh)
-                            self.sendLine(dh)          
+                            self.sendLine(dh)
+                            self.dealer_score.append(self.deal.dealer[1])
+                            self.dealer_amount = Total().tally(self.dealer_score)                                      
             if self.line[1] != self.pspot:
                 out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + self.line[2]).convert()
                 self.screen.blit(out, (self.positions[self.line[1] - 1][0], self.positions[self.line[1] - 1][1]))
@@ -131,6 +133,8 @@ class Client(object):
                              ]
                         dh = simplejson.dumps(dh)
                         self.sendLine(dh)
+                        self.dealer_score.append(self.deal.dealer[1])
+                        self.dealer_amount = Total().tally(self.dealer_score)
             else:
                 self.turn = 1
 
@@ -167,6 +171,8 @@ class Client(object):
                                  ]
                             dh = simplejson.dumps(dh)
                             self.sendLine(dh)
+                            self.dealer_score.append(self.deal.dealer[1])
+                            self.dealer_amount = Total().tally(self.dealer_score)
             # make all done flag ??
                 if self.deal_rect.collidepoint(pos):
                     allhands = ['Deal']
@@ -208,7 +214,7 @@ class BlackClientProtocol(LineReceiver):
 
     def lineReceived(self, line):
         self.recv(line)
-        print line
+        #print line
 
 
 class BlackClient(ClientFactory):
