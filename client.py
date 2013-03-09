@@ -240,5 +240,5 @@ if __name__ == '__main__':
     # LoopingCall method to keep checking 'tick' method for pygame events 
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
+    reactor.connectTCP('INTERNAL_IP OF SERVER', 6000, BlackClient(c))
     reactor.run()
