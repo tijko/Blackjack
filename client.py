@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import simplejson
+import sys
 import os
 
 import pygame
@@ -12,6 +13,7 @@ from twisted.internet.task import LoopingCall
 
 from lib.actions import Shuffle, Deal, Take, Hold, Total
 
+PATH = os.path.abspath('')
 
 
 class Client(object):
@@ -29,29 +31,29 @@ class Client(object):
         self.dspot_x = 290
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
-        self.bust = pygame.image.load(os.environ['HOME'] + '/Pictures/images/bust.png').convert_alpha()
-        self.dealer_blackjack = pygame.image.load(os.environ['HOME'] + '/Pictures/images/dealer_blackjack.png').convert_alpha()
-        self.player_blackjack = pygame.image.load(os.environ['HOME'] + '/Pictures/images/player_blackjack.png').convert_alpha()
-        self.dealer_wins = pygame.image.load(os.environ['HOME'] + '/Pictures/images/dealer_wins.png').convert_alpha()
-        self.player_wins = pygame.image.load(os.environ['HOME'] + '/Pictures/images/player_wins.png').convert_alpha()
-        self.tie = pygame.image.load(os.environ['HOME'] + '/Pictures/images/tie.png').convert_alpha()
-        self.stand_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/deal.png').convert_alpha()
-        self.hit_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/hit.png').convert_alpha()
+        self.bust = pygame.image.load(PATH + '/images/bust.png').convert_alpha()
+        self.dealer_blackjack = pygame.image.load(PATH + '/images/dealer_blackjack.png').convert_alpha()
+        self.player_blackjack = pygame.image.load(PATH + '/images/player_blackjack.png').convert_alpha()
+        self.dealer_wins = pygame.image.load(PATH + '/images/dealer_wins.png').convert_alpha()
+        self.player_wins = pygame.image.load(PATH + '/images/player_wins.png').convert_alpha()
+        self.tie = pygame.image.load(PATH + '/images/tie.png').convert_alpha()
+        self.stand_image = pygame.image.load(PATH + '/images/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load(PATH + '/images/deal.png').convert_alpha()
+        self.hit_image = pygame.image.load(PATH + '/images/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
-        backdrop = pygame.image.load(os.environ['HOME'] + '/Pictures/images/black.jpg').convert()
+        backdrop = pygame.image.load(PATH + '/images/black.jpg').convert()
         self.screen.blit(backdrop,(0,0))
-        table = pygame.image.load(os.environ['HOME'] + '/Pictures/images/new.png').convert_alpha()
+        table = pygame.image.load(PATH + '/images/new.png').convert_alpha()
         self.screen.blit(table,(0,50))
-        banner = pygame.image.load(os.environ['HOME'] + '/Pictures/images/banner.png').convert_alpha()
+        banner = pygame.image.load(PATH + '/images/banner.png').convert_alpha()
         self.screen.blit(banner,(205,505))
-        decoration = pygame.image.load(os.environ['HOME'] + '/Pictures/images/start.png').convert()
+        decoration = pygame.image.load(PATH + '/images/start.png').convert()
         self.screen.blit(decoration,(565,150))
-        self.stand_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/deal.png').convert_alpha()
-        self.hit_image = pygame.image.load(os.environ['HOME'] + '/Pictures/images/hit.png').convert_alpha()
+        self.stand_image = pygame.image.load(PATH + '/images/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load(PATH + '/images/deal.png').convert_alpha()
+        self.hit_image = pygame.image.load(PATH + '/images/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
@@ -76,15 +78,15 @@ class Client(object):
                 self.screen.blit(self.player_blackjack,(230, 200))
             for i in self.line[1:]:
                 for j in i[:-1]:
-                    out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + j).convert()
+                    out = pygame.image.load((PATH + '/images/') + j).convert()
                     self.screen.blit(out, (self.positions[self.line[1:].index(i)][0], self.positions[self.line[1:].index(i)][1]))
                     self.positions[self.line[1:].index(i)][0] += 30
             pygame.display.flip() 
 
         if 'edge.png' in self.line:
-            edge = pygame.image.load(os.environ['HOME'] + '/Pictures/images/edge.png').convert()
+            edge = pygame.image.load(PATH + '/images/edge.png').convert()
             self.screen.blit(edge,(332,100))
-            out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + self.line[0]).convert()
+            out = pygame.image.load((PATH + '/images/') + self.line[0]).convert()
             self.screen.blit(out, (260, 100))
             self.dealer_score = self.line[1] 
             self.dealer_amount = Total().tally(self.dealer_score)
@@ -92,7 +94,7 @@ class Client(object):
 
         if 'card' in self.line:
             if self.line[1] == self.pspot:
-                out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + self.line[2]).convert()
+                out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
                 self.screen.blit(out, (self.positions[self.pspot - 1][0], self.positions[self.pspot - 1][1]))
                 self.positions[self.pspot - 1][0] += 30
                 self.player_score.append(self.line[3])
@@ -114,7 +116,7 @@ class Client(object):
                             self.dealer_score.append(self.deal.dealer[1])
                             self.dealer_amount = Total().tally(self.dealer_score)                                      
             if self.line[1] != self.pspot:
-                out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + self.line[2]).convert()
+                out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
                 self.screen.blit(out, (self.positions[self.line[1] - 1][0], self.positions[self.line[1] - 1][1]))
                 self.positions[self.line[1] - 1][0] += 30
             pygame.display.flip()
@@ -139,7 +141,7 @@ class Client(object):
                 self.turn = 1
 
         if 'dh' in self.line:
-            out = pygame.image.load((os.environ['HOME'] + '/Pictures/images/') + self.line[0]).convert()
+            out = pygame.image.load((PATH + '/images/') + self.line[0]).convert()
             self.screen.blit(out,(self.dspot_x, 100))
             self.dspot_x += 30
             self.dealer_score.append(self.line[2])
