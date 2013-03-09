@@ -10,7 +10,7 @@ connect to your network.
 
 Blackjack uses pygames, if you don't already have pygames installed, you can get a copy [here](http://www.pygame.org/news.html).
 
-##Configure
+###Configure
 
 Have someone run the server.py file.  Which ever person is running the server, you are
 going to need that person's machines internal ip address.  Once you know that address,
