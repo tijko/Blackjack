@@ -23,7 +23,6 @@ class Game_Data(LineReceiver):
 
     def lineReceived(self,line):
         self.line = line
-       # print self.line
         for client in self.clients:
             client.sendLine(self.line)
 
