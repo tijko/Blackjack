@@ -26,6 +26,7 @@ class Client(object):
     def __init__(self):
         pygame.init()
         self.turn = 0
+        self.deal_lock = 1
         self.pname = ''
         self.positions = [[50, 240], [230, 360], [460, 280]]
         self.dspot_x = 290
@@ -72,10 +73,9 @@ class Client(object):
 
         if self.line[0] == 'Deal':
             self.__init__()
+            self.deal_lock = 0
             self.player_score = self.line[self.pspot][2] 
             self.player_amount = Total().tally(self.player_score)
-            if self.player_amount == 21:
-                self.screen.blit(self.player_blackjack,(230, 200))
             for i in self.line[1:]:
                 for j in i[:-1]:
                     out = pygame.image.load((PATH + '/images/') + j).convert()
@@ -116,7 +116,9 @@ class Client(object):
                             dh = simplejson.dumps(dh)
                             self.sendLine(dh)
                             self.dealer_score.append(self.deal.dealer[1])
-                            self.dealer_amount = Total().tally(self.dealer_score)                                      
+                            self.dealer_amount = Total().tally(self.dealer_score)
+                        unlock = simplejson.dumps('unlock')
+                        self.sendLine(unlock)                                      
             if self.line[1] != self.pspot:
                 out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
                 self.screen.blit(out, (self.positions[self.line[1] - 1][0], 
@@ -140,6 +142,8 @@ class Client(object):
                         self.sendLine(dh)
                         self.dealer_score.append(self.deal.dealer[1])
                         self.dealer_amount = Total().tally(self.dealer_score)
+                    unlock = simplejson.dumps('unlock')
+                    self.sendLine(unlock)
             else:
                 self.turn = 1
 
@@ -150,6 +154,9 @@ class Client(object):
             self.dealer_score.append(self.line[2])
             self.dealer_amount = Total().tally(self.dealer_score)
             pygame.display.flip()
+
+        if 'unlock' in self.lin:
+            self.deal_lock = 1
                    
     def tick(self):
         # pygame events func. #
@@ -178,7 +185,7 @@ class Client(object):
                             self.sendLine(dh)
                             self.dealer_score.append(self.deal.dealer[1])
                             self.dealer_amount = Total().tally(self.dealer_score)
-                if self.deal_rect.collidepoint(pos):
+                if self.deal_rect.collidepoint(pos) and self.deal_lock == 1:
                     allhands = ['Deal']
                     self.deal = Deal()
                     for player in self.playrlst:
