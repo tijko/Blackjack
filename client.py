@@ -155,7 +155,7 @@ class Client(object):
             self.dealer_amount = Total().tally(self.dealer_score)
             pygame.display.flip()
 
-        if 'unlock' in self.lin:
+        if 'unlock' in self.line:
             self.deal_lock = 1
                    
     def tick(self):
