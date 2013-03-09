@@ -79,7 +79,8 @@ class Client(object):
             for i in self.line[1:]:
                 for j in i[:-1]:
                     out = pygame.image.load((PATH + '/images/') + j).convert()
-                    self.screen.blit(out, (self.positions[self.line[1:].index(i)][0], self.positions[self.line[1:].index(i)][1]))
+                    self.screen.blit(out, (self.positions[self.line[1:].index(i)][0], 
+                                           self.positions[self.line[1:].index(i)][1]))
                     self.positions[self.line[1:].index(i)][0] += 30
             pygame.display.flip() 
 
@@ -95,7 +96,8 @@ class Client(object):
         if 'card' in self.line:
             if self.line[1] == self.pspot:
                 out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
-                self.screen.blit(out, (self.positions[self.pspot - 1][0], self.positions[self.pspot - 1][1]))
+                self.screen.blit(out, (self.positions[self.pspot - 1][0], 
+                                       self.positions[self.pspot - 1][1]))
                 self.positions[self.pspot - 1][0] += 30
                 self.player_score.append(self.line[3])
                 self.player_amount = Total().tally(self.player_score)
@@ -117,7 +119,8 @@ class Client(object):
                             self.dealer_amount = Total().tally(self.dealer_score)                                      
             if self.line[1] != self.pspot:
                 out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
-                self.screen.blit(out, (self.positions[self.line[1] - 1][0], self.positions[self.line[1] - 1][1]))
+                self.screen.blit(out, (self.positions[self.line[1] - 1][0], 
+                                       self.positions[self.line[1] - 1][1]))
                 self.positions[self.line[1] - 1][0] += 30
             pygame.display.flip()
 
