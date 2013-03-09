@@ -178,7 +178,6 @@ class Client(object):
                             self.sendLine(dh)
                             self.dealer_score.append(self.deal.dealer[1])
                             self.dealer_amount = Total().tally(self.dealer_score)
-            # make all done flag ??
                 if self.deal_rect.collidepoint(pos):
                     allhands = ['Deal']
                     self.deal = Deal()
@@ -219,7 +218,6 @@ class BlackClientProtocol(LineReceiver):
 
     def lineReceived(self, line):
         self.recv(line)
-        #print line
 
 
 class BlackClient(ClientFactory):
