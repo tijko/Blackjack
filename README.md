@@ -10,5 +10,4 @@ connect to your network.
 
 Blackjack uses pygames, if you don't already have pygames installed, you can get a copy [here](http://www.pygame.org/news.html).
 
-Put the images in your 'Pictures' directory.  Have someone run the server.py file, then everyone 
-run client.py.  
+Have someone run the server.py file, then everyone run client.py.  
