@@ -62,6 +62,18 @@ class Client(object):
         # twisted callLater method to switch between pygame events method and the twisted signals 
         reactor.callLater(0.1, self.tick)
 
+    def results(self):
+        if self.dealer_amount > self.player_amount and self.dealer_amount < 22:
+            self.screen.blit(self.dealer_wins,(260, 200))
+        if self.dealer_amount == self.player_amount:
+            self.screen.blit(self.tie,(250, 200))
+        if self.dealer_amount < self.player_amount:
+            self.screen.blit(self.player_wins,(250, 200)) 
+        if self.dealer_amount > 21:
+            # could use 'dealer_bust'
+            self.screen.blit(self.player_wins,(250, 200))
+        pygame.display.flip()
+
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
@@ -148,6 +160,8 @@ class Client(object):
                     self.sendLine(dh)
                     self.dealer_score.append(self.deal.dealer[1])
                     self.dealer_amount = Total().tally(self.dealer_score)
+                dealer_score = simplejson.dumps(['dealer_score', self.dealer_amount])
+                self.sendLine(dealer_score)
             else:
                 self.deal = Deal()
                 self.deal.__init__()
@@ -164,6 +178,11 @@ class Client(object):
 
         if 'unlock' in self.line:
             self.deal_lock = 1
+
+        if 'dealer_score' in self.line:
+            self.dealer_amount = self.line[1]
+            if self.player_amount < 22:
+                self.results()
                    
     def tick(self):
         # pygame events func. #
