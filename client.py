@@ -69,6 +69,8 @@ class Client(object):
             if self.pname == '':
                 self.pname = self.line[-1]
                 self.pspot = int(self.pname[-1])
+                score = simplejson.dumps(['allscores'] + [0 for i in self.line[1:]])
+                self.sendLine(score)
             self.playrlst = self.line[1:]
 
         if self.line[0] == 'Deal':
@@ -105,20 +107,12 @@ class Client(object):
                     self.turn = 0
                     turn = 'turn' + str(self.pspot + 1)
                     turn = simplejson.dumps(turn)
+                    self.allscores[self.pspot] = self.player_amount
+                    score = simplejson.dumps(self.allscores)
+                    self.sendLine(score)
                     self.sendLine(turn)
-                    if self.pspot + 1 > len(self.playrlst):
-                        while self.dealer_amount < 17:
-                            self.deal = Deal()
-                            self.deal.__init__()
-                            dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
-                                  'dh', self.deal.dealer[1] 
-                                 ]
-                            dh = simplejson.dumps(dh)
-                            self.sendLine(dh)
-                            self.dealer_score.append(self.deal.dealer[1])
-                            self.dealer_amount = Total().tally(self.dealer_score)
-                        unlock = simplejson.dumps('unlock')
-                        self.sendLine(unlock)                                      
+                    if self.player_amount > 21:
+                        self.screen.blit(self.bust, (200, 200))
             if self.line[1] != self.pspot:
                 out = pygame.image.load((PATH + '/images/') + self.line[2]).convert()
                 self.screen.blit(out, (self.positions[self.line[1] - 1][0], 
@@ -131,19 +125,6 @@ class Client(object):
                 turn = 'turn' + str(self.pspot + 1)
                 turn = simplejson.dumps(turn)
                 self.sendLine(turn)
-                if self.pspot + 1 > len(self.playrlst):
-                    while self.dealer_amount < 17:
-                        self.deal = Deal()
-                        self.deal.__init__()
-                        dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
-                              'dh', self.deal.dealer[1] 
-                             ]
-                        dh = simplejson.dumps(dh)
-                        self.sendLine(dh)
-                        self.dealer_score.append(self.deal.dealer[1])
-                        self.dealer_amount = Total().tally(self.dealer_score)
-                    unlock = simplejson.dumps('unlock')
-                    self.sendLine(unlock)
             else:
                 self.turn = 1
 
@@ -154,6 +135,32 @@ class Client(object):
             self.dealer_score.append(self.line[2])
             self.dealer_amount = Total().tally(self.dealer_score)
             pygame.display.flip()
+
+        if 'turn' in self.line and int(self.line[-1]) > len(self.playrlst) and self.pspot == 1:
+            if any(i < 22 for i in self.allscores[1:]): 
+                while self.dealer_amount < 17:
+                    self.deal = Deal()
+                    self.deal.__init__()
+                    dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
+                          'dh', self.deal.dealer[1] 
+                         ]
+                    dh = simplejson.dumps(dh)
+                    self.sendLine(dh)
+                    self.dealer_score.append(self.deal.dealer[1])
+                    self.dealer_amount = Total().tally(self.dealer_score)
+            else:
+                self.deal = Deal()
+                self.deal.__init__()
+                dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
+                      'dh', self.deal.dealer[1]
+                     ]
+                dh = simplejson.dumps(dh)
+                self.sendLine(dh)
+            lock = simplejson.dumps('unlock')
+            self.sendLine(lock)
+
+        if 'allscores' in self.line:                          
+            self.allscores = self.line
 
         if 'unlock' in self.line:
             self.deal_lock = 1
@@ -171,20 +178,12 @@ class Client(object):
                 # checks if 'pos' is on 'stand_rect' #
                 if self.stand_rect.collidepoint(pos) and self.turn == 1:
                     self.turn = 0
+                    self.allscores[self.pspot] = self.player_amount
+                    score = simplejson.dumps(self.allscores)
+                    self.sendLine(score)
                     turn = 'turn' + str(self.pspot + 1)
                     turn = simplejson.dumps(turn)
                     self.sendLine(turn)
-                    if self.pspot + 1 > len(self.playrlst):
-                        while self.dealer_amount < 17:
-                            self.deal = Deal()
-                            self.deal.__init__()
-                            dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
-                                  'dh', self.deal.dealer[1] 
-                                 ]
-                            dh = simplejson.dumps(dh)
-                            self.sendLine(dh)
-                            self.dealer_score.append(self.deal.dealer[1])
-                            self.dealer_amount = Total().tally(self.dealer_score)
                 if self.deal_rect.collidepoint(pos) and self.deal_lock == 1:
                     allhands = ['Deal']
                     self.deal = Deal()
@@ -247,5 +246,5 @@ if __name__ == '__main__':
     # LoopingCall method to keep checking 'tick' method for pygame events 
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('INTERNAL_IP OF SERVER', 6000, BlackClient(c))
+    reactor.connectTCP('SERVERS_IP', 6000, BlackClient(c))
     reactor.run()
