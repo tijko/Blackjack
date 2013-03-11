@@ -65,10 +65,35 @@ class Client(object):
     def results(self):
         if self.dealer_amount > self.player_amount and self.dealer_amount < 22:
             self.screen.blit(self.dealer_wins,(260, 200))
-        if self.dealer_amount == self.player_amount:
+
+        if (self.dealer_amount == self.player_amount and
+            len(self.dealer_hand) == len(self.player_hand)):
             self.screen.blit(self.tie,(250, 200))
-        if self.dealer_amount < self.player_amount:
-            self.screen.blit(self.player_wins,(250, 200)) 
+
+        if (self.dealer_amount == self.player_amount and
+            self.dealer_amount != 21 and
+            self.player_amount != 21):
+            self.screen.blit(self.tie,(250, 200))
+
+        if (self.dealer_amount < self.player_amount and
+            len(self.player_hand) != 2):
+            self.screen.blit(self.player_wins,(250, 200))
+
+        if (self.dealer_amount < self.player_amount and
+            len(self.player_hand) == 2 and
+            self.player_amount != 21):
+            self.screen.blit(self.player_wins,(250, 200))
+
+        if (self.dealer_amount < self.player_amount and
+            self.player_amount == 21 and
+            len(self.player_hand) == 2):
+            self.screen.blit(self.player_blackjack,(230, 200))        
+
+        if (self.dealer_amount == self.player_amount and
+            self.dealer_amount == 21 and
+            len(self.dealer_hand) == 2:
+            self.screen.blit(self.dealer_blackjack,(230, 200))
+
         if self.dealer_amount > 21:
             # could use 'dealer_bust'
             self.screen.blit(self.player_wins,(250, 200))
@@ -90,6 +115,7 @@ class Client(object):
             self.deal_lock = 0
             self.player_score = self.line[self.pspot][2] 
             self.player_amount = Total().tally(self.player_score)
+            self.player_hand = self.line[self.pspot][:2]
             for i in self.line[1:]:
                 for j in i[:-1]:
                     out = pygame.image.load((PATH + '/images/') + j).convert()
@@ -105,6 +131,7 @@ class Client(object):
             self.screen.blit(out, (260, 100))
             self.dealer_score = self.line[1] 
             self.dealer_amount = Total().tally(self.dealer_score)
+            self.dealer_hand = [self.line[0]]
             pygame.display.flip()
 
         if 'card' in self.line:
@@ -115,6 +142,7 @@ class Client(object):
                 self.positions[self.pspot - 1][0] += 30
                 self.player_score.append(self.line[3])
                 self.player_amount = Total().tally(self.player_score)
+                self.player_hand.append(self.line[2])
                 if self.player_amount >= 21:
                     self.turn = 0
                     turn = 'turn' + str(self.pspot + 1)
@@ -146,6 +174,7 @@ class Client(object):
             self.dspot_x += 30
             self.dealer_score.append(self.line[2])
             self.dealer_amount = Total().tally(self.dealer_score)
+            self.dealer_hand.append(self.line[0])
             pygame.display.flip()
 
         if 'turn' in self.line and int(self.line[-1]) > len(self.playrlst) and self.pspot == 1:
@@ -265,5 +294,5 @@ if __name__ == '__main__':
     # LoopingCall method to keep checking 'tick' method for pygame events 
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('SERVERS_IP', 6000, BlackClient(c))
+    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
     reactor.run()
