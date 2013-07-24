@@ -30,6 +30,8 @@ class Client(object):
         self.pname = ''
         self.positions = [[50, 240], [230, 360], [460, 280]]
         self.dspot_x = 290
+        self.dealer_bj = False
+        self.player_bj = False
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load(PATH + '/images/bust.png').convert_alpha()
@@ -63,39 +65,15 @@ class Client(object):
         reactor.callLater(0.1, self.tick)
 
     def results(self):
-        if self.dealer_amount > self.player_amount and self.dealer_amount < 22:
+        if self.dealer_bj and not self.player_bj:
+            self.screen.blit(self.dealer_blackjack, (230, 200))
+        elif self.player_bj and not self.dealer_bj:
+            self.screen.blit(self.player_blackjack, (230, 200))
+        elif self.dealer_amount > self.player_amount:
             self.screen.blit(self.dealer_wins,(260, 200))
-
-        if (self.dealer_amount == self.player_amount and
-            len(self.dealer_hand) == len(self.player_hand)):
+        elif self.dealer_amount == self.player_amount:
             self.screen.blit(self.tie,(250, 200))
-
-        if (self.dealer_amount == self.player_amount and
-            self.dealer_amount != 21 and
-            self.player_amount != 21):
-            self.screen.blit(self.tie,(250, 200))
-
-        if (self.dealer_amount < self.player_amount and
-            len(self.player_hand) != 2):
-            self.screen.blit(self.player_wins,(250, 200))
-
-        if (self.dealer_amount < self.player_amount and
-            len(self.player_hand) == 2 and
-            self.player_amount != 21):
-            self.screen.blit(self.player_wins,(250, 200))
-
-        if (self.dealer_amount < self.player_amount and
-            self.player_amount == 21 and
-            len(self.player_hand) == 2):
-            self.screen.blit(self.player_blackjack,(230, 200))        
-
-        if (self.dealer_amount == self.player_amount and
-            self.dealer_amount == 21 and
-            len(self.dealer_hand) == 2:
-            self.screen.blit(self.dealer_blackjack,(230, 200))
-
-        if self.dealer_amount > 21:
-            # could use 'dealer_bust'
+        elif self.dealer_amount < self.player_amount:
             self.screen.blit(self.player_wins,(250, 200))
         pygame.display.flip()
 
@@ -164,6 +142,10 @@ class Client(object):
             if self.player_amount == 21:
                 turn = 'turn' + str(self.pspot + 1)
                 turn = simplejson.dumps(turn)
+                self.player_bj = True
+                self.allscores[self.pspot] = 'Blackjack'
+                score = simplejson.dumps(self.allscores)
+                self.sendLine(score)
                 self.sendLine(turn)
             else:
                 self.turn = 1
@@ -189,9 +171,14 @@ class Client(object):
                     self.sendLine(dh)
                     self.dealer_score.append(self.deal.dealer[1])
                     self.dealer_amount = Total().tally(self.dealer_score)
+                    if len(self.dealer_score) == 2 and self.dealer_amount == 21:
+                        self.dealer_bj = True
                 dealer_score = simplejson.dumps(['dealer_score', self.dealer_amount])
                 self.sendLine(dealer_score)
             else:
+                self.dealer_amount = Total().tally(self.dealer_score)
+                dealer_score = simplejson.dumps(['dealer_score', self.dealer_amount])
+                self.sendLine(dealer_score)
                 self.deal = Deal()
                 self.deal.__init__()
                 dh = [self.deal.dealer[0] + self.deal.dealer[1] + '.png',
@@ -211,8 +198,15 @@ class Client(object):
         if 'dealer_score' in self.line:
             self.dealer_amount = self.line[1]
             if self.player_amount < 22:
-                self.results()
-                   
+                if self.dealer_amount < 22:
+                    self.results()
+                else:
+                    if self.player_bj:
+                        self.screen.blit(self.player_blackjack, (230, 200))
+                    else:
+                        self.screen.blit(self.player_wins, (250, 200))
+                    pygame.display.flip()
+               
     def tick(self):
         # pygame events func. #
         for event in pygame.event.get():
@@ -294,5 +288,5 @@ if __name__ == '__main__':
     # LoopingCall method to keep checking 'tick' method for pygame events 
     lc = LoopingCall(c.tick)
     lc.start(0.1)
-    reactor.connectTCP('192.168.1.2', 6000, BlackClient(c))
+    reactor.connectTCP('192.168.1.5', 6000, BlackClient(c))
     reactor.run()
