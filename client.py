@@ -18,10 +18,8 @@ PATH = os.path.abspath('')
 
 class Client(object):
     """
-    Class to handle setting default screen,
-    to check data received from the server,
-    send data to the server, and handle
-    pygame events.
+    Class to handle setting default screen, to check data received from the server,
+    send data to the server, and handle pygame events.
     """
     def __init__(self):
         pygame.init()
@@ -35,18 +33,26 @@ class Client(object):
         self.screen = pygame.display.set_mode((800, 600))
         pygame.mouse.set_visible(1)
         self.bust = pygame.image.load(PATH + '/images/bust.png').convert_alpha()
-        self.dealer_blackjack = pygame.image.load(PATH + '/images/dealer_blackjack.png').convert_alpha()
-        self.player_blackjack = pygame.image.load(PATH + '/images/player_blackjack.png').convert_alpha()
-        self.dealer_wins = pygame.image.load(PATH + '/images/dealer_wins.png').convert_alpha()
-        self.player_wins = pygame.image.load(PATH + '/images/player_wins.png').convert_alpha()
+        self.dealer_blackjack = pygame.image.load(PATH + 
+                                                  '/images/dealer_blackjack.png').convert_alpha()
+        self.player_blackjack = pygame.image.load(PATH + 
+                                                  '/images/player_blackjack.png').convert_alpha()
+        self.dealer_wins = pygame.image.load(PATH + 
+                                             '/images/dealer_wins.png').convert_alpha()
+        self.player_wins = pygame.image.load(PATH + 
+                                             '/images/player_wins.png').convert_alpha()
         self.tie = pygame.image.load(PATH + '/images/tie.png').convert_alpha()
-        self.stand_image = pygame.image.load(PATH + '/images/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load(PATH + '/images/deal.png').convert_alpha()
-        self.hit_image = pygame.image.load(PATH + '/images/hit.png').convert_alpha()
+        self.stand_image = pygame.image.load(PATH + 
+                                             '/images/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load(PATH + 
+                                            '/images/deal.png').convert_alpha()
+        self.hit_image = pygame.image.load(PATH + 
+                                           '/images/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
         self.hit_rect = self.screen.blit(self.hit_image,(562,445))
-        backdrop = pygame.image.load(PATH + '/images/black.jpg').convert()
+        backdrop = pygame.image.load(PATH + 
+                                     '/images/black.jpg').convert()
         self.screen.blit(backdrop,(0,0))
         table = pygame.image.load(PATH + '/images/new.png').convert_alpha()
         self.screen.blit(table,(0,50))
@@ -54,8 +60,10 @@ class Client(object):
         self.screen.blit(banner,(205,505))
         decoration = pygame.image.load(PATH + '/images/start.png').convert()
         self.screen.blit(decoration,(565,150))
-        self.stand_image = pygame.image.load(PATH + '/images/stand.png').convert_alpha()
-        self.deal_image = pygame.image.load(PATH + '/images/deal.png').convert_alpha()
+        self.stand_image = pygame.image.load(PATH + 
+                                             '/images/stand.png').convert_alpha()
+        self.deal_image = pygame.image.load(PATH + 
+                                            '/images/deal.png').convert_alpha()
         self.hit_image = pygame.image.load(PATH + '/images/hit.png').convert_alpha()
         self.stand_rect = self.screen.blit(self.stand_image,(630,420))
         self.deal_rect = self.screen.blit(self.deal_image,(690,380))
@@ -159,7 +167,9 @@ class Client(object):
             self.dealer_hand.append(self.line[0])
             pygame.display.flip()
 
-        if 'turn' in self.line and int(self.line[-1]) > len(self.playrlst) and self.pspot == 1:
+        if ('turn' in self.line and 
+            int(self.line[-1]) > len(self.playrlst) and 
+            self.pspot == 1):
             if any(i < 22 for i in self.allscores[1:]): 
                 while self.dealer_amount < 17:
                     self.deal = Deal()
@@ -213,6 +223,8 @@ class Client(object):
             if event.type == pygame.QUIT:
                 return
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                reactor.stop()
+                pygame.display.quit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # gets mouse coordinates if mouse clicked #
@@ -247,7 +259,9 @@ class Client(object):
                     turn = 'turn1'
                     turn = simplejson.dumps(turn)
                     self.sendLine(turn)      
-                if self.hit_rect.collidepoint(pos) and self.player_amount < 21 and self.turn == 1:
+                if (self.hit_rect.collidepoint(pos) and 
+                    self.player_amount < 21 and 
+                    self.turn == 1):
                     new_card = Take().card()    
                     card = ['card', self.pspot, 
                             new_card[0] + new_card[1] + '.png',
@@ -258,8 +272,7 @@ class Client(object):
 
 class BlackClientProtocol(LineReceiver):
     """ 
-    Class client for receiving data
-    from the server.
+    Class client for receiving data from the server.
     """
     def __init__(self, recv):
         self.recv = recv
@@ -270,8 +283,7 @@ class BlackClientProtocol(LineReceiver):
 
 class BlackClient(ClientFactory):
     """
-    Class that builds protocol instances
-    to send to the server.
+    Class that builds protocol instances to send to the server.
     """
     def __init__(self, client):
         self.client = client
