@@ -88,6 +88,11 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
+        if 'Table Full' in self.line:
+            reactor.stop()
+            pygame.display.quit()
+            print "Table Full"
+            return
         if 'players_list' in self.line:
             if self.pname == '':
                 self.pname = self.line[-1]
