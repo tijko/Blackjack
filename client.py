@@ -88,6 +88,7 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
+        print self.line
         if 'Table Full' in self.line:
             reactor.stop()
             pygame.display.quit()
@@ -107,7 +108,7 @@ class Client(object):
             self.player_score = self.line[self.pspot][2] 
             self.player_amount = Total().tally(self.player_score)
             self.player_hand = self.line[self.pspot][:2]
-            for i in self.line[1:]:
+            for i in self.line[1:]: # rewrite to map each player to position
                 for j in i[:-1]:
                     out = pygame.image.load((PATH + '/images/') + j).convert()
                     self.screen.blit(out, (self.positions[self.line[1:].index(i)][0], 
