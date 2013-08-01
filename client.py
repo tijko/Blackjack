@@ -7,7 +7,7 @@ import os
 import pygame
 
 from twisted.internet import reactor
-from twisted.internet.protocol import Protocol, ClientFactory
+from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.task import LoopingCall
 
@@ -88,7 +88,6 @@ class Client(object):
     def new_line(self, line):
         self.line = line
         self.line = simplejson.loads(self.line)
-        print self.line
         if 'Table Full' in self.line:
             reactor.stop()
             pygame.display.quit()
@@ -289,12 +288,12 @@ class BlackClientProtocol(LineReceiver):
 
 class BlackClient(ClientFactory):
     """
-    Class that builds protocol instances to send to the server.
+    Class that builds protocol instances.
     """
     def __init__(self, client):
         self.client = client
 
-    # builds protocol to send data 
+    # builds protocol instance  
     def buildProtocol(self, addr):
         proto = BlackClientProtocol(self.client.new_line)
         self.client.sendLine = proto.sendLine
