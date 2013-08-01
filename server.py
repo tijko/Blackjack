@@ -14,14 +14,18 @@ class Game_Data(LineReceiver):
         self.clients = clients 
 
     def connectionMade(self):
-        new_player = 'player_' + str(len(self.players[1:]) + 1)
-        self.clients.append(self)
-        self.players.append(new_player)
-        self.players = simplejson.dumps(self.players)
-        for client in self.clients:
-            client.sendLine(self.players)
+        if len(self.players) <= 3:
+            new_player = 'player_' + str(len(self.players[1:]) + 1)
+            self.clients.append(self)
+            self.players.append(new_player)
+            self.players = simplejson.dumps(self.players)
+            for client in self.clients:
+                client.sendLine(self.players)
+        else:
+            table_full = simplejson.dumps("Table Full")
+            self.sendLine(table_full)
 
-    def lineReceived(self,line):
+    def lineReceived(self, line):
         self.line = line
         for client in self.clients:
             client.sendLine(self.line)
