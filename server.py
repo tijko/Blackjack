@@ -16,14 +16,23 @@ class Game_Data(LineReceiver):
     def connectionMade(self):
         if len(self.players) <= 3:
             new_player = 'player_' + str(len(self.players[1:]) + 1)
-            self.clients.append(self)
+            self.clients[self] = new_player
             self.players.append(new_player)
-            self.players = simplejson.dumps(self.players)
+            updated_players = simplejson.dumps(self.players)
             for client in self.clients:
-                client.sendLine(self.players)
+                client.sendLine(updated_players)
         else:
             table_full = simplejson.dumps("Table Full")
             self.sendLine(table_full)
+
+    def connectionLost(self, reason):
+        print "Player %s disconnected!" % self
+        lost_player = self.clients[self]
+        self.players.remove(lost_player)
+        del self.clients[self]
+        updated_players = simplejson.dumps(self.players)
+        for client in self.clients:
+            client.sendLine(updated_players)
 
     def lineReceived(self, line):
         self.line = line
@@ -35,7 +44,7 @@ class BlackFactory(Factory):
 
     def __init__(self):
         self.players = ['players_list']
-        self.clients = []
+        self.clients = dict() 
 
     def buildProtocol(self, addr):
         return Game_Data(self.players, self.clients) 
