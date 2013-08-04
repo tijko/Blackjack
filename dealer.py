@@ -48,14 +48,12 @@ class HandEvents(object):
 class Dealer(object):
 
     def __init__(self, players, seats):
-        self.actions = {'new_hand':self.new_hand,
-                        'player_total':self.tally_score,
-                        'dealers_turn':self.dealers_turn}
         self.players = players
         self.seats = seats
         self.scores = dict()
+        self.deal = HandEvents()
 
-    def new_hand(self, status):
+    def new_hand(self):
         self.deal = HandEvents()  
         hands = defaultdict(list)
         deal_hands = {'player_hands':hands}
@@ -78,14 +76,14 @@ class Dealer(object):
         # make turn msg {'turn':lowest number in players_list}
 
     def tally_score(self, player_stats):
-        print player_stats
-        cards = player_stats[1]
+        player = player_stats.keys()[0]
+        cards = player_stats[player]
         score = self.deal.total(cards)
-        self.scores[player_stats[0]] = score
+        self.scores[player] = score
         score_msg = {'allscores':self.scores}
         score_msg = simplejson.dumps(score_msg)
-        for client in self.clients:
-            client.sendLine(score_msg)
+        for player in self.seats:
+            player.sendLine(score_msg)
 
     def dealers_turn(self):
         while self.dealer_amount < 17:
@@ -151,12 +149,12 @@ class GameData(LineReceiver):
     def lineReceived(self, line):
         game_msg = simplejson.loads(line)
         action = game_msg.keys()[0]
-        load = game_msg.values()
-        dealer_action = self.dealer.actions.get(action)
-        if dealer_action:  
+        if action == 'new_hand':  
             self.dealer.players = self.players
             self.dealer.seats = self.clients
-            dealer_action(load)
+            self.dealer.new_hand()
+        elif action == 'player_total':
+            self.dealer.tally_score(game_msg['player_total'])
         else:
             for client in self.clients:
                 client.sendLine(self.line)
