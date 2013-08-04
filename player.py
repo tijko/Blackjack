@@ -22,7 +22,7 @@ class Client(object):
     def __init__(self):
         self.turn = 0
         self.player = None
-        self.deal_lock = False 
+        self.deal_lock = True 
         self.dealer_bj = False
         self.player_bj = False
         self.gd = GameDisplay()
@@ -48,6 +48,7 @@ class Client(object):
         print player_list
         if not self.player:
             self.player = player_list[-1]
+            self.pl_key = str(self.player)
         self.playrlst = player_list
 
     def player_turn(self, msg):
@@ -69,10 +70,10 @@ class Client(object):
     def player_hands(self, hands):
         self.gd.default_scr()
         self.deal_lock = 0
-        self.hand_values = hands[self.player - 1][2:]
+        self.hand_values = hands[self.pl_key][2:] 
         self.player_total
-        self.player_hand = hands[self.player - 1][:2]
-        hands = [hand[:2] for hand in hands]
+        self.player_hand = hands[self.pl_key][:2]
+        hands = [hand[:2] for hand in hands.values()]
         self.gd.display_hands(hands)
 
     def player_card(self, msg): 
@@ -98,7 +99,7 @@ class Client(object):
 
     @property
     def player_total(self):
-        total_msg = {'player_total':[self.player, self.hand_values]}
+        total_msg = {'player_total':{self.player:self.hand_values}}
         total_msg = simplejson.dumps(total_msg)
         self.sendLine(total_msg)         
         
