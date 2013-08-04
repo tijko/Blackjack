@@ -48,7 +48,7 @@ class HandEvents(object):
 class Dealer(object):
 
     def __init__(self, players, seats):
-        self.players = players
+        self.players = [str(player) for player in players]
         self.seats = seats
         self.scores = dict()
         self.deal = HandEvents()
@@ -64,6 +64,7 @@ class Dealer(object):
                     card1[1], card2[1]]
             for card in hand:
                 deal_hands['player_hands'][player].append(card)
+            self.scores[player] = self.deal.total(hand[2:])
         deal_hands = simplejson.dumps(deal_hands)
         for player in self.seats:
             player.sendLine(deal_hands)
@@ -75,11 +76,11 @@ class Dealer(object):
             player.sendLine(dealer_start)
         # make turn msg {'turn':lowest number in players_list}
 
-    def tally_score(self, player_stats):
+    def score(self, player_stats):
         player = player_stats.keys()[0]
-        cards = player_stats[player]
-        score = self.deal.total(cards)
-        self.scores[player] = score
+        #cards = player_stats[player]
+        #score = self.deal.total(cards)
+        #self.scores[player] = score
         score_msg = {'allscores':self.scores}
         score_msg = simplejson.dumps(score_msg)
         for player in self.seats:
@@ -116,11 +117,11 @@ class Dealer(object):
 
 class GameData(LineReceiver):
 
-    def __init__(self, players, clients): 
+    def __init__(self, dealer, players, clients): 
         self.players = players
         self.clients = clients 
+        self.dealer = dealer
         self.max_players = set(range(1, 4))
-        self.dealer = Dealer(self.players, self.clients)
 
     def connectionMade(self):
         if len(self.players['players_list']) <= 3:
@@ -148,13 +149,14 @@ class GameData(LineReceiver):
 
     def lineReceived(self, line):
         game_msg = simplejson.loads(line)
+        print game_msg
         action = game_msg.keys()[0]
         if action == 'new_hand':  
             self.dealer.players = self.players
             self.dealer.seats = self.clients
             self.dealer.new_hand()
         elif action == 'player_total':
-            self.dealer.tally_score(game_msg['player_total'])
+            self.dealer.score(game_msg['player_total'])
         else:
             for client in self.clients:
                 client.sendLine(self.line)
@@ -166,9 +168,10 @@ class BlackFactory(Factory):
         self.players = defaultdict(list)
         self.players['players_list']
         self.clients = dict() 
+        self.dealer = Dealer(self.players, self.clients)
 
     def buildProtocol(self, addr):
-        return GameData(self.players, self.clients) 
+        return GameData(self.dealer, self.players, self.clients) 
 
 
 if __name__ == '__main__':
