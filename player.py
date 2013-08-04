@@ -45,7 +45,6 @@ class Client(object):
         self.msg_actions[msg_type](load)
 
     def players(self, player_list): 
-        print player_list
         if not self.player:
             self.player = player_list[-1]
             self.pl_key = str(self.player)
