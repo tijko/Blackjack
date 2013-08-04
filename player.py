@@ -22,7 +22,7 @@ class Client(object):
     def __init__(self):
         self.turn = 0
         self.player = None
-        self.deal_lock = True 
+        self.deal_lock = False 
         self.dealer_bj = False
         self.player_bj = False
         self.gd = GameDisplay()
@@ -68,7 +68,7 @@ class Client(object):
 
     def player_hands(self, hands):
         self.gd.default_scr()
-        self.deal_lock = 0
+        self.deal_lock = True 
         self.hand_values = hands[self.pl_key][2:] 
         self.player_total
         self.player_hand = hands[self.pl_key][:2]
@@ -102,12 +102,10 @@ class Client(object):
         total_msg = simplejson.dumps(total_msg)
         self.sendLine(total_msg)         
         
-    def table_totals(self, msg):
-        self.allscores = msg 
+    def table_totals(self, scores):
+        self.allscores = scores
+        self.player_score = scores[self.pl_key] 
 
-    def dealing_lock(self, msg):
-        self.deal_lock = 1
-            
     def dealer_hand(self, hand):
         self.gd.display_dealer(hand[0])
         #self.dealer_score = msg[1] 
@@ -168,19 +166,26 @@ class Client(object):
                     self.sendLine(score_msg)
                     self.sendLine(turn_msg)
 
-                if self.gd.deal.collidepoint(pos) and self.deal_lock == True:
+                if self.gd.deal.collidepoint(pos) and self.deal_lock == False:
                     deal_msg = {'new_hand':None}
                     deal_msg = simplejson.dumps(deal_msg)
                     self.sendLine(deal_msg)                    
+                    self.deal_lock = True
 
                 if (self.gd.hit.collidepoint(pos) and 
-                    self.player_amount < 21 and 
-                    self.turn == 1):
-                    new_card = Take().card()    
+
+                    self.player_total < 21 and 
+
+                    self.turn == self.player):
+
+#                    new_card = Take().card()    
+
                     card = ['card', self.player, 
                             new_card[0] + new_card[1] + '.png',
                             new_card[1]]
+
                     card = simplejson.dumps(card)
+
                     self.sendLine(card)
 
     def table_full(self, msg):
