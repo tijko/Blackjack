@@ -55,12 +55,12 @@ class GameDisplay(object):
     def display_hands(self, hands): 
         pl = 1
         for hand in hands:
-            for card in hand[:-1]:
+            for card in hand:
                 show_card = pygame.image.load(PATH + card)
                 show_card.convert_alpha()
                 self.screen.blit(show_card, (self.positions[pl][0],
                                              self.positions[pl][1]))
-                self.positions[hands.index(hand)][0] += 30 
+                self.positions[pl][0] += 30 
             pl += 1
         pygame.display.flip()
 
