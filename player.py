@@ -37,7 +37,7 @@ class Client(object):
                             'turn':self.player_turn,
                             'allscores':self.table_totals
                            } 
-        reactor.callLater(0.1, self.tick) # switch between pygame and twisted signals
+        reactor.callLater(0.1, self.py_event) # pygame and twisted signals
 
     def game_messages(self, msg): 
         print msg
@@ -132,7 +132,7 @@ class Client(object):
         elif self.dealer_amount < self.player_amount:
             self.gd.player_win()
                
-    def tick(self):
+    def py_event(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -201,7 +201,7 @@ class BlackClient(ClientFactory):
 if __name__ == '__main__':
     c = Client()
     # LoopingCall method to keep checking 'tick' method for pygame events 
-    lc = LoopingCall(c.tick)
+    lc = LoopingCall(c.py_event)
     lc.start(0.1)
     reactor.connectTCP('192.168.1.3', 6000, BlackClient(c))
     reactor.run()
