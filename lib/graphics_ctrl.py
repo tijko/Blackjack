@@ -80,7 +80,7 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def display_dealer_take(self, card):
-        card = pygame.display.load(PATH + card[0])
+        card = pygame.image.load(PATH + card[0])
         card.convert_alpha()
         self.screen.blit(card, (self.dspot_x, 100))
         self.dspot_x += 30
