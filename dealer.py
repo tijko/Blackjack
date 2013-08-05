@@ -59,7 +59,6 @@ class Dealer(object):
         turn_msg = {'turn':min(self.players['players_list'])}
         turn_msg = simplejson.dumps(turn_msg)
         self.signal_players(turn_msg)
-        # make turn msg {'turn':lowest number in players_list}
 
     @property
     def deal_players(self):
@@ -153,6 +152,7 @@ class GameData(LineReceiver):
             client.sendLine(updated_players)
 
     def lineReceived(self, line):
+        print line
         game_msg = simplejson.loads(line)
         action = game_msg.keys()[0]
         if action == 'new_hand':  
@@ -164,8 +164,8 @@ class GameData(LineReceiver):
         elif action == 'dealers_turn':
             self.dealer.dealers_turn()
         else:
+            game_msg = simplejson.dumps(game_msg)
             for client in self.clients:
-                game_msg = simplejson.dumps(game_msg)
                 client.sendLine(game_msg)
 
 
