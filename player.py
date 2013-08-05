@@ -32,6 +32,8 @@ class Client(object):
                             'player_card':self.player_card,
                             'player_hands':self.player_hands,
                             'dealer_start':self.dealer_hand,
+                            'dealer_score':self.dealer_score,
+                            'dealer_card':self.dealer_card,
                             'turn':self.player_turn,
                             'allscores':self.table_totals
                            } 
@@ -50,9 +52,10 @@ class Client(object):
             self.pl_key = str(self.player)
         self.playrlst = player_list
 
-    def player_turn(self, msg):
-        if msg[-1] == self.player:
-            if self.player_amount == 21:
+    def player_turn(self, turn):
+        if turn == self.player:
+            self.turn = turn
+            if self.player_score == 21:
                 self.turn += 1
                 turn_msg = {'turn':self.turn}
                 turn_msg = simplejson.dumps(turn_msg)
@@ -61,20 +64,20 @@ class Client(object):
                 score_msg = simplejson.dumps(self.allscores)
                 self.sendLine(score_msg)
                 self.sendLine(turn_msg)
-            else:
-                self.turn = 1
-        elif msg[-1] > len(self.playrlst) and self.player == 1:
-            self.dealers_turn(msg)
+        elif turn > len(self.playrlst) and self.player == 1:
+            dealer_msg = {'dealers_turn':None}
+            dealer_msg = simplejson.dumps(dealer_msg)
+            self.sendLine(dealer_msg)
 
     def player_hands(self, hands):
         self.gd.default_scr()
         self.deal_lock = True 
         self.hand_values = hands[self.pl_key][2:] 
-        self.player_total
         self.player_hand = hands[self.pl_key][:2]
         hands = [hand[:2] for hand in hands.values()]
         self.gd.display_hands(hands)
 
+# HIT / Take a card method
     def player_card(self, msg): 
         if msg[0] == self.player:
             self.gd.display_card(msg[2], self.player)
@@ -108,31 +111,15 @@ class Client(object):
 
     def dealer_hand(self, hand):
         self.gd.display_dealer(hand[0])
-        #self.dealer_score = msg[1] 
-        #self.dealer_amount = total(self.dealer_score)
-        #self.dealer_hand = [msg]
+        self.dealer_hand = [hand[0]]
 
-    def dealer_card(self, msg):
-        self.gd.display_dealer_take(msg)
-        self.dealer_score.append(self.line[2])
-        self.dealer_amount = total(self.dealer_score)
-        self.dealer_hand.append(msg[0])
+    def dealer_score(self, score):
+        self.dealer_score = score
 
-    def dealers_turn(self, msg):
-        if any(i < 22 for i in self.allscores[1:]): # send to dealer
-            pass
+    def dealer_card(self, card):
+        self.dealer_hand.append(card[1])
+        self.gd.display_dealer_take(card)
 
-    def dealer_score(self, msg):
-        self.dealer_amount = msg
-        if self.player_amount < 22:
-            if self.dealer_amount < 22:
-                self.results()
-            else:
-                if self.player_bj:
-                    self.gd.player_bj()
-                else:
-                    self.player_win()
-                                         
     def results(self):
         if self.dealer_bj and not self.player_bj:	
             self.gd.dealer_bj()
@@ -156,36 +143,28 @@ class Client(object):
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # gets mouse coordinates if mouse clicked 
                 pos = pygame.mouse.get_pos()
-
                 if self.gd.stand.collidepoint(pos) and self.player == self.turn:
                     self.turn += 1
-                    self.allscores[self.player] = self.player_amount
+                    self.allscores[self.player] = self.player_score
                     turn_msg = {'turn':self.turn}
                     turn_msg = simplejson.dumps(turn_msg)
-                    score_msg = simplejson.dumps(self.allscores)
+                    score_msg = {'allscores':self.allscores}
+                    score_msg = simplejson.dumps(score_msg)
                     self.sendLine(score_msg)
                     self.sendLine(turn_msg)
-
                 if self.gd.deal.collidepoint(pos) and self.deal_lock == False:
                     deal_msg = {'new_hand':None}
                     deal_msg = simplejson.dumps(deal_msg)
                     self.sendLine(deal_msg)                    
                     self.deal_lock = True
-
                 if (self.gd.hit.collidepoint(pos) and 
-
                     self.player_total < 21 and 
-
                     self.turn == self.player):
-
 #                    new_card = Take().card()    
-
                     card = ['card', self.player, 
                             new_card[0] + new_card[1] + '.png',
                             new_card[1]]
-
                     card = simplejson.dumps(card)
-
                     self.sendLine(card)
 
     def table_full(self, msg):
