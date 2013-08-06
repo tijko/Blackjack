@@ -24,14 +24,15 @@ class Dealer(object):
         self.signal_players(turn_msg)
 
     def deal_card(self, player): 
-        card = self.deal.deal_card()
-        self.hands[player].append(card[1])
-        player_hand = self.hands[player]
-        self.scores[player] = self.deal.total(player_hand)
-        self.send_player_score(player)
-        card_msg = {'player_card':{player:card}}
-        card_msg = simplejson.dumps(card_msg)
-        self.signal_players(card_msg)        
+        if self.scores:
+            card = self.deal.deal_card()
+            self.hands[player].append(card[1])
+            player_hand = self.hands[player]
+            self.scores[player] = self.deal.total(player_hand)
+            self.send_player_score(player)
+            card_msg = {'player_card':{player:card}}
+            card_msg = simplejson.dumps(card_msg)
+            self.signal_players(card_msg)        
 
     @property
     def deal_players(self):
@@ -84,16 +85,18 @@ class Dealer(object):
         player_seats[player].sendLine(score_msg)
 
     def dealers_turn(self):
-        self.dealer_take # signal to dealer about blackjack
-        if any(i < 22 for i in self.scores.values()):
-            while self.score < 17:
-                self.dealer_take
-        results_msg = {'results':None}
-        results_msg = simplejson.dumps(results_msg)
-        self.signal_players(results_msg)
-        turn_msg = {'turn':min(self.players['players_list'])}
-        turn_msg = simplejson.dumps(turn_msg)
-        self.signal_players(turn_msg)    
+        if self.scores:
+            self.dealer_take # signal to dealer about blackjack
+            if any(i < 22 for i in self.scores.values()):
+                while self.score < 17:
+                    self.dealer_take
+            results_msg = {'results':None}
+            results_msg = simplejson.dumps(results_msg)
+            self.signal_players(results_msg)
+            self.scores = dict()
+            turn_msg = {'turn':min(self.players['players_list'])}
+            turn_msg = simplejson.dumps(turn_msg)
+            self.signal_players(turn_msg)    
 
     def signal_players(self, msg):
         for player in self.seats:
@@ -121,8 +124,8 @@ class HandEvents(object):
         for card in cards:
             if self.cards.has_key(card):
                 amount += self.cards[card]
-        if amount > 21 and 'ace' in cards: # adjust this
-            for i in range(cards.count('ace')): 
+        if amount > 21 and 'ace.png' in cards: 
+            for i in range(cards.count('ace.png')): 
                 if amount > 21:
                     amount -= 10
         return amount
