@@ -62,11 +62,8 @@ class Client(object):
         if turn == self.player:
             self.turn = turn
             if self.player_score == 21:
-                self.turn += 1
-                turn_msg = {'turn':self.turn}
-                turn_msg = simplejson.dumps(turn_msg)
                 self.player_bj = True
-                self.sendLine(turn_msg)
+                self.stand
         elif turn > len(self.playrlst) and self.player == 1: # adjust 
             dealer_msg = {'dealers_turn':None}
             dealer_msg = simplejson.dumps(dealer_msg)
@@ -84,21 +81,15 @@ class Client(object):
         self.gd.display_card(card_msg)
 
     def player_bust(self):
-        self.turn += 1
-        turn_msg = {'turn':self.turn}
-        turn_msg = simplejson.dumps(turn_msg)
-        self.sendLine(turn_msg)
         self.gd.player_bust()
+        self.stand
 
     def total_score(self, score_msg):
         self.player_score = score_msg
         if self.player_score > 21:
             self.player_bust()
         elif self.player_score == 21:
-            self.turn += 1
-            turn_msg = {'turn':self.turn}
-            turn_msg = simplejson.dumps(turn_msg)
-            self.sendLine(turn_msg)
+            self.stand
 
     def dealer_hand(self, hand):
         self.gd.display_dealer(hand[0])
