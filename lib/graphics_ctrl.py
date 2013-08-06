@@ -89,11 +89,11 @@ class GameDisplay(object):
         self.dspot_x += 30
         pygame.display.flip()
 
-    def dealer_bj(self):
+    def dealer_blackjack(self):
         self.screen.blit(self.dealer_bj, (230, 200))
         pygame.display.flip()
 
-    def player_bj(self):
+    def player_blackjack(self):
         self.screen.blit(self.player_bj, (230, 200))
         pygame.display.flip()
 
