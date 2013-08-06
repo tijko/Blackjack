@@ -8,43 +8,6 @@ from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
 
 
-class HandEvents(object):
-
-    def __init__(self):    
-        self.suits = ['heart','diamond','spade','club'] * 13
-        self.cards = {'deuce.png':2, 'three.png':3, 'four.png':4, 'five.png':5,
-                      'six.png':6, 'seven.png':7, 'eight.png':8,'nine.png':9, 
-                      'ten.png':10, 'jack.png':10, 'queen.png':10, 
-                      'king.png':10, 'ace.png':11}
-        self.deck = list(itertools.izip(self.suits, self.cards.keys() * 4)) * 6
-        random.shuffle(self.deck)
-
-    def deal_card(self):
-        card = self.deck[0]
-        self.deck.pop(0) 
-        return card
-
-    def total(self, cards):
-        amount = 0
-        for card in cards:
-            if self.cards.has_key(card):
-                amount += self.cards[card]
-        if amount > 21 and 'ace' in cards:
-            for i in range(cards.count('ace')):
-                if amount > 21:
-                    amount -= 10
-        return amount
-
-    def hold(self, score):
-        comp = total(score)
-        if comp > 16:
-            return    
-        if comp < 17:
-            card = deck[0]
-            deck.pop(0)
-            return card
-
-
 class Dealer(object):
 
     def __init__(self, players, seats):
@@ -59,6 +22,12 @@ class Dealer(object):
         turn_msg = {'turn':min(self.players['players_list'])}
         turn_msg = simplejson.dumps(turn_msg)
         self.signal_players(turn_msg)
+
+    def deal_card(self, player):
+        card = self.deal.deal_card()
+        card_msg = {'player_card':{player:card}}
+        card_msg = simplejson.dumps(card_msg)
+        self.signal_players(card_msg)        
 
     @property
     def deal_players(self):
@@ -101,12 +70,13 @@ class Dealer(object):
         self.signal_players(dealer_card)
         self.signal_players(dealer_score)
 
-    def score(self, player_stats):
+    def score_player(self, player_stats):
         player = player_stats.keys()[0]
+        score = self.deal.total(player_stats[player])
+        self.scores[int(player)] = score
         score_msg = {'allscores':self.scores}
         score_msg = simplejson.dumps(score_msg)
-        for player in self.seats:
-            player.sendLine(score_msg)
+        self.signal_players(score_msg)
 
     def dealers_turn(self):
         self.dealer_take
@@ -117,6 +87,43 @@ class Dealer(object):
     def signal_players(self, msg):
         for player in self.seats:
             player.sendLine(msg)        
+
+
+class HandEvents(object):
+
+    def __init__(self):    
+        self.suits = ['heart','diamond','spade','club'] * 13
+        self.cards = {'deuce.png':2, 'three.png':3, 'four.png':4, 'five.png':5,
+                      'six.png':6, 'seven.png':7, 'eight.png':8,'nine.png':9, 
+                      'ten.png':10, 'jack.png':10, 'queen.png':10, 
+                      'king.png':10, 'ace.png':11}
+        self.deck = list(itertools.izip(self.suits, self.cards.keys() * 4)) * 6
+        random.shuffle(self.deck)
+
+    def deal_card(self):
+        card = self.deck[0]
+        self.deck.pop(0) 
+        return card
+
+    def total(self, cards):
+        amount = 0
+        for card in cards:
+            if self.cards.has_key(card):
+                amount += self.cards[card]
+        if amount > 21 and 'ace' in cards:
+            for i in range(cards.count('ace')):
+                if amount > 21:
+                    amount -= 10
+        return amount
+
+    def hold(self, score):
+        comp = total(score)
+        if comp > 16:
+            return    
+        if comp < 17:
+            card = deck[0]
+            deck.pop(0)
+            return card
 
 
 class GameData(LineReceiver):
@@ -160,9 +167,11 @@ class GameData(LineReceiver):
             self.dealer.seats = self.clients
             self.dealer.new_hand()
         elif action == 'player_total':
-            self.dealer.score(game_msg['player_total'])
+            self.dealer.score_player(game_msg['player_total'])
         elif action == 'dealers_turn':
             self.dealer.dealers_turn()
+        elif action == 'player_card':
+            self.dealer.deal_card(game_msg['player_card'])
         else:
             game_msg = simplejson.dumps(game_msg)
             for client in self.clients:
