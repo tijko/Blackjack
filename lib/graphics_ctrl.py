@@ -109,7 +109,7 @@ class GameDisplay(object):
         self.screen.blit(self.bust, (200, 200))
         pygame.display.flip()
 
-    def tie(self):
+    def tie_game(self):
         self.screen.blit(self.tie, (250, 200))
         pygame.display.flip()
 
