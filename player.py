@@ -46,6 +46,8 @@ class Client(object):
             if self.player_score <= 21:
                 self.results()        
             self.deal_lock = False
+            self.player_bj = False
+            self.dealer_bj = False
         else:
             load = game_msg[msg_type]
             self.msg_actions[msg_type](load)
@@ -65,7 +67,7 @@ class Client(object):
                 turn_msg = simplejson.dumps(turn_msg)
                 self.player_bj = True
                 self.sendLine(turn_msg)
-        elif turn > len(self.playrlst) and self.player == 1:
+        elif turn > len(self.playrlst) and self.player == 1: # adjust 
             dealer_msg = {'dealers_turn':None}
             dealer_msg = simplejson.dumps(dealer_msg)
             self.sendLine(dealer_msg)
@@ -90,12 +92,13 @@ class Client(object):
 
     def total_score(self, score_msg):
         self.player_score = score_msg
-
-    def table_totals(self, scores):
-        self.allscores = scores
-        self.player_score = scores[self.pl_key] 
         if self.player_score > 21:
             self.player_bust()
+        elif self.player_score == 21:
+            self.turn += 1
+            turn_msg = {'turn':self.turn}
+            turn_msg = simplejson.dumps(turn_msg)
+            self.sendLine(turn_msg)
 
     def dealer_hand(self, hand):
         self.gd.display_dealer(hand[0])
@@ -126,9 +129,10 @@ class Client(object):
                     		
     @property
     def hit(self):
-        hit_msg = {'player_card':self.player}
-        hit_msg = simplejson.dumps(hit_msg)
-        self.sendLine(hit_msg)
+        if self.player_score < 21:
+            hit_msg = {'player_card':self.player}
+            hit_msg = simplejson.dumps(hit_msg)
+            self.sendLine(hit_msg)
 
     def results(self):
         if self.dealer_bj and not self.player_bj:	
