@@ -34,8 +34,8 @@ class Client(object):
                             'dealer_start':self.dealer_hand,
                             'dealer_score':self.dealer_score,
                             'dealer_card':self.dealer_card,
-                            'turn':self.player_turn,
-                            'allscores':self.table_totals,
+                            'score':self.total_score,
+                            'turn':self.player_turn
                            } 
         reactor.callLater(0.1, self.py_event) # pygame and twisted signals
 
@@ -64,9 +64,6 @@ class Client(object):
                 turn_msg = {'turn':self.turn}
                 turn_msg = simplejson.dumps(turn_msg)
                 self.player_bj = True
-                self.allscores[self.pl_key] = 'Blackjack'
-                score_msg = simplejson.dumps({'allscores':self.allscores})
-                self.sendLine(score_msg)
                 self.sendLine(turn_msg)
         elif turn > len(self.playrlst) and self.player == 1:
             dealer_msg = {'dealers_turn':None}
@@ -76,8 +73,6 @@ class Client(object):
     def player_hands(self, hands):
         self.gd.default_scr()
         self.deal_lock = True 
-        self.hand_values = hands[self.pl_key][2:] 
-        self.player_hand = hands[self.pl_key][:2]
         hands = [hand[:2] for hand in hands.values()]
         self.gd.display_hands(hands)
 
@@ -85,11 +80,6 @@ class Client(object):
         player = card_msg.keys()[0]
         card = ''.join(i for i in card_msg[player])
         self.gd.display_card(card_msg)
-        if self.pl_key == player:
-            card_val = card_msg[player][1]
-            self.hand_values.append(card_val)
-            self.player_hand.append(card)
-            self.player_total
 
     def player_bust(self):
         self.turn += 1
@@ -98,12 +88,9 @@ class Client(object):
         self.sendLine(turn_msg)
         self.gd.player_bust()
 
-    @property
-    def player_total(self):
-        total_msg = {'player_total':{self.player:self.hand_values}}
-        total_msg = simplejson.dumps(total_msg)
-        self.sendLine(total_msg)         
-        
+    def total_score(self, score_msg):
+        self.player_score = score_msg
+
     def table_totals(self, scores):
         self.allscores = scores
         self.player_score = scores[self.pl_key] 
@@ -133,12 +120,8 @@ class Client(object):
     @property
     def stand(self):
         self.turn += 1
-        self.allscores[self.player] = self.player_score
         turn_msg = {'turn':self.turn}
         turn_msg = simplejson.dumps(turn_msg)
-        score_msg = {'allscores':self.allscores}
-        score_msg = simplejson.dumps(score_msg)
-        self.sendLine(score_msg)
         self.sendLine(turn_msg)
                     		
     @property
@@ -149,9 +132,9 @@ class Client(object):
 
     def results(self):
         if self.dealer_bj and not self.player_bj:	
-            self.gd.dealer_bj()
+            self.gd.dealer_blackjack()
         elif self.player_bj and not self.dealer_bj:
-            self.gd.player_bj()
+            self.gd.player_blackjack()
         elif self.dealer_score > 21:
             self.gd.player_win()
         elif self.dealer_score > self.player_score:
