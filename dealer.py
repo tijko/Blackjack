@@ -130,15 +130,6 @@ class HandEvents(object):
                     amount -= 10
         return amount
 
-    def hold(self, score):
-        comp = total(score)
-        if comp > 16:
-            return    
-        if comp < 17:
-            card = deck[0]
-            deck.pop(0)
-            return card
-
 
 class GameData(LineReceiver):
 
