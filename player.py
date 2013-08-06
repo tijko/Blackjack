@@ -35,16 +35,20 @@ class Client(object):
                             'dealer_score':self.dealer_score,
                             'dealer_card':self.dealer_card,
                             'turn':self.player_turn,
-                            'allscores':self.table_totals
+                            'allscores':self.table_totals,
                            } 
         reactor.callLater(0.1, self.py_event) # pygame and twisted signals
 
     def game_messages(self, msg): 
-        print msg
         game_msg = simplejson.loads(msg)
         msg_type = game_msg.keys()[0]
-        load = game_msg[msg_type]
-        self.msg_actions[msg_type](load)
+        if msg_type == 'results':
+            if self.player_score <= 21:
+                self.results()        
+            self.deal_lock = False
+        else:
+            load = game_msg[msg_type]
+            self.msg_actions[msg_type](load)
 
     def players(self, player_list): 
         if not self.player:
@@ -112,6 +116,8 @@ class Client(object):
 
     def dealer_score(self, score):
         self.dealer_score = score
+        if self.dealer_score == 'Blackjack':
+            self.dealer_bj = True
 
     def dealer_card(self, card):
         self.dealer_hand.append(card[1])
@@ -146,11 +152,13 @@ class Client(object):
             self.gd.dealer_bj()
         elif self.player_bj and not self.dealer_bj:
             self.gd.player_bj()
-        elif self.dealer_amount > self.player_amount:
+        elif self.dealer_score > 21:
+            self.gd.player_win()
+        elif self.dealer_score > self.player_score:
             self.gd.dealer_win()
-        elif self.dealer_amount == self.player_amount:
-            self.gd.tie()
-        elif self.dealer_amount < self.player_amount:
+        elif self.dealer_score == self.player_score:
+            self.gd.tie_game()
+        elif self.dealer_score < self.player_score:
             self.gd.player_win()
                
     def py_event(self):
