@@ -41,7 +41,7 @@ class GameDisplay(object):
         self.edge.convert_alpha()
      
     def default_scr(self):
-        self.positions = {1:[50, 240], 2:[460, 280], 3:[230, 360]}
+        self.positions = {1:[50, 240], 2:[230, 360], 3:[460, 280]}
         self.dspot_x = 290
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (0, 50))
@@ -53,7 +53,7 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def display_hands(self, hands): 
-        pl = 1
+        pl = 1 # needs to be handed player_list
         for hand in hands:
             for card in hand:
                 show_card = pygame.image.load(PATH + card)
