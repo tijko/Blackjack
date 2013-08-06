@@ -142,8 +142,8 @@ class GameData(LineReceiver):
     def connectionMade(self):
         if len(self.players['players_list']) <= 3:
             taken_seats = self.players['players_list']
-            available_seats = list(self.max_players.difference(taken_seats))
-            new_player = available_seats[0]
+            available_seats = self.max_players.difference(taken_seats)
+            new_player = list(available_seats)[0]
             self.clients[self] = new_player
             self.players['players_list'].append(new_player)
             updated_players = simplejson.dumps(self.players)
