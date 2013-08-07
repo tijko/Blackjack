@@ -51,6 +51,8 @@ class Client(object):
         else:
             load = game_msg[msg_type]
             self.msg_actions[msg_type](load)
+            if msg_type == 'player_hands':
+                self.hand = load[self.pl_key][:2]
 
     def players(self, player_list): 
         if not self.player:
@@ -62,7 +64,8 @@ class Client(object):
         if turn == self.player:
             self.turn = turn
             if self.player_score == 21:
-                self.player_bj = True
+                if len(self.hand) == 2:
+                    self.player_bj = True
                 self.stand
 
     def player_hands(self, hands):
@@ -76,6 +79,8 @@ class Client(object):
     def player_card(self, card_msg): 
         player = card_msg.keys()[0]
         card = ''.join(i for i in card_msg[player])
+        if player == self.pl_key:
+            self.hand.append(card)
         self.gd.display_card(card_msg)
 
     def player_bust(self):
@@ -87,6 +92,8 @@ class Client(object):
         if self.player_score > 21:
             self.player_bust()
         elif self.player_score == 21:
+            if len(self.hand) == 2:
+                self.player_bj = True
             self.stand
 
     def dealer_hand(self, hand):
