@@ -71,7 +71,7 @@ class Client(object):
         self.turn_gen = (i for i in self.playrlst)
         self.turn = self.turn_gen.next()
         hands = [hand[:2] for hand in hands.values()]
-        self.gd.display_hands(hands)
+        self.gd.display_hands(self.playrlst, hands)
 
     def player_card(self, card_msg): 
         player = card_msg.keys()[0]
