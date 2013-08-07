@@ -52,16 +52,16 @@ class GameDisplay(object):
         self.hit = self.screen.blit(self.hit_btn, (562, 445))
         pygame.display.flip()
 
-    def display_hands(self, hands): 
-        pl = 1 # needs to be handed player_list
+    def display_hands(self, players, hands): 
+        players = (i for i in players) 
         for hand in hands:
+            pl = players.next()
             for card in hand:
                 show_card = pygame.image.load(PATH + card)
                 show_card.convert_alpha()
                 self.screen.blit(show_card, (self.positions[pl][0],
                                              self.positions[pl][1]))
                 self.positions[pl][0] += 30 
-            pl += 1
         pygame.display.flip()
 
     def display_card(self, card_msg):
