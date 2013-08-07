@@ -64,14 +64,12 @@ class Client(object):
             if self.player_score == 21:
                 self.player_bj = True
                 self.stand
-        elif turn > len(self.playrlst) and self.player == 1: # adjust 
-            dealer_msg = {'dealers_turn':None}
-            dealer_msg = simplejson.dumps(dealer_msg)
-            self.sendLine(dealer_msg)
 
     def player_hands(self, hands):
         self.gd.default_scr()
         self.deal_lock = True 
+        self.turn_gen = (i for i in self.playrlst)
+        self.turn = self.turn_gen.next()
         hands = [hand[:2] for hand in hands.values()]
         self.gd.display_hands(hands)
 
@@ -113,10 +111,15 @@ class Client(object):
 
     @property
     def stand(self):
-        self.turn += 1
-        turn_msg = {'turn':self.turn}
-        turn_msg = simplejson.dumps(turn_msg)
-        self.sendLine(turn_msg)
+        try:
+            self.turn = self.turn_gen.next()
+            turn_msg = {'turn':self.turn}
+            turn_msg = simplejson.dumps(turn_msg)
+            self.sendLine(turn_msg)
+        except StopIteration:
+            dealer_msg = {'dealers_turn':None}
+            dealer_msg = simplejson.dumps(dealer_msg)
+            self.sendLine(dealer_msg)            
                     		
     @property
     def hit(self):
