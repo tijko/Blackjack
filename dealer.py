@@ -70,7 +70,7 @@ class Dealer(object):
         self.hand.append(card[1])
         dealer_card = {'dealer_card':[''.join(i for i in card), card[1]]}
         dealer_card = simplejson.dumps(dealer_card)
-        self.score += self.deal.total(card[1:])
+        self.score = self.deal.total(self.hand)
         if len(self.hand) == 2 and self.score == 21:
             dealer_score = {'dealer_score':'Blackjack'}
         else:
