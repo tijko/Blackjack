@@ -19,7 +19,8 @@ class Dealer(object):
         self.deal = HandEvents()  
         self.deal_players
         self.deal_dealer
-        turn_msg = {'turn':min(self.players['players_list'])}
+        self.turn_gen = (i for i in self.players)
+        turn_msg = {'turn':self.turn_gen.next()}
         turn_msg = simplejson.dumps(turn_msg)
         self.signal_players(turn_msg)
 
@@ -94,9 +95,6 @@ class Dealer(object):
             results_msg = simplejson.dumps(results_msg)
             self.signal_players(results_msg)
             self.scores = dict()
-            turn_msg = {'turn':min(self.players['players_list'])}
-            turn_msg = simplejson.dumps(turn_msg)
-            self.signal_players(turn_msg)    
 
     def signal_players(self, msg):
         for player in self.seats:
