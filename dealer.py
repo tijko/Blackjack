@@ -30,10 +30,11 @@ class Dealer(object):
             self.hands[player].append(card[1])
             player_hand = self.hands[player]
             self.scores[player] = self.deal.total(player_hand)
-            self.send_player_score(player)
+#            self.send_player_score(player)
             card_msg = {'player_card':{player:card}}
             card_msg = simplejson.dumps(card_msg)
             self.signal_players(card_msg)        
+            self.send_player_score(player)
 
     @property
     def deal_players(self):
