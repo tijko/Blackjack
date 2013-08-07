@@ -41,7 +41,7 @@ class GameDisplay(object):
         self.edge.convert_alpha()
      
     def default_scr(self):
-        self.positions = {1:[50, 240], 2:[230, 360], 3:[460, 280]}
+        self.positions = {'1':[50, 240], '2':[230, 360], '3':[460, 280]}
         self.dspot_x = 290
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (0, 50))
@@ -52,11 +52,9 @@ class GameDisplay(object):
         self.hit = self.screen.blit(self.hit_btn, (562, 445))
         pygame.display.flip()
 
-    def display_hands(self, players, hands): 
-        players = (i for i in players) 
-        for hand in hands:
-            pl = players.next()
-            for card in hand:
+    def display_hands(self, player_hands): 
+        for pl in player_hands:
+            for card in player_hands[pl][:2]:
                 show_card = pygame.image.load(PATH + card)
                 show_card.convert_alpha()
                 self.screen.blit(show_card, (self.positions[pl][0],
@@ -66,13 +64,12 @@ class GameDisplay(object):
 
     def display_card(self, card_msg):
         player = card_msg.keys()[0]
-        pl_key = int(player)
         card = ''.join(i for i in card_msg[player])
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
-        self.screen.blit(card, (self.positions[pl_key][0],
-                               self.positions[pl_key][1]))
-        self.positions[pl_key][0] += 30
+        self.screen.blit(card, (self.positions[player][0], 
+                               self.positions[player][1]))
+        self.positions[player][0] += 30
         pygame.display.flip()
 
     def display_dealer(self, card):
