@@ -17,6 +17,7 @@ class Dealer(object):
 
     def new_hand(self):
         self.deal = HandEvents()  
+        self.player_blackjacks = 0
         self.deal_players
         self.deal_dealer
         turn = min(self.players['players_list'])        
@@ -47,6 +48,8 @@ class Dealer(object):
             for card in hand:
                 deal_hands['player_hands'][player].append(card)
             self.scores[player] = self.deal.total(hand[2:]) 
+            if self.scores[player] == 21:
+                self.player_blackjacks += 1
             self.send_player_score(player)
         deal_hands = simplejson.dumps(deal_hands)
         self.signal_players(deal_hands)
@@ -87,8 +90,9 @@ class Dealer(object):
 
     def dealers_turn(self):
         if self.scores:
-            self.dealer_take # signal to dealer about blackjack
-            if any(i < 22 for i in self.scores.values()):
+            self.dealer_take 
+            if (any(i < 22 for i in self.scores.values()) 
+                and self.player_blackjacks < len(self.players)):
                 while self.score < 17:
                     self.dealer_take
             results_msg = {'results':None}
