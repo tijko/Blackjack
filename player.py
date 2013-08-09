@@ -22,7 +22,8 @@ class Client(object):
     def __init__(self):
         self.turn = 0
         self.player = None
-        self.deal_lock = False 
+        self.hand = None
+        self.deal_lock = True 
         self.dealer_bj = False
         self.player_bj = False
         self.gd = GameDisplay()
@@ -58,6 +59,7 @@ class Client(object):
         if not self.player:
             self.player = player_list[-1]
             self.pl_key = str(self.player)
+        self.deal_lock = False
         self.playrlst = player_list
 
     def player_turn(self, turn):
@@ -88,7 +90,7 @@ class Client(object):
         if self.player_score > 21:
             self.player_bust()
         elif self.player_score == 21:
-            if len(self.hand) == 2:
+            if len(self.hand) == 2: 
                 self.player_bj = True
             self.stand
 
