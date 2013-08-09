@@ -87,11 +87,11 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def dealer_blackjack(self):
-        self.screen.blit(self.dealer_bj, (230, 200))
+        self.screen.blit(self.dealer_bj, (200, 200))
         pygame.display.flip()
 
     def player_blackjack(self):
-        self.screen.blit(self.player_bj, (230, 200))
+        self.screen.blit(self.player_bj, (200, 200))
         pygame.display.flip()
 
     def dealer_win(self):
@@ -103,7 +103,7 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def player_bust(self):
-        self.screen.blit(self.bust, (200, 200))
+        self.screen.blit(self.bust, (150, 200))
         pygame.display.flip()
 
     def tie_game(self):
