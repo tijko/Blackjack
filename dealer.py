@@ -16,6 +16,8 @@ class Dealer(object):
         self.scores = dict()
 
     def new_hand(self):
+        players = simplejson.dumps(self.players)
+        self.signal_players(players)
         self.deal = HandEvents()  
         self.player_blackjacks = 0
         self.deal_players
@@ -135,22 +137,25 @@ class HandEvents(object):
 
 class GameData(LineReceiver):
 
-    def __init__(self, dealer, players, clients): 
+    def __init__(self, dealer, players, clients, game): 
         self.players = players
         self.clients = clients 
         self.dealer = dealer
+        self.next_game = game
         self.max_players = set(range(1, 4))
 
     def connectionMade(self):
         if len(self.players['players_list']) <= 3:
-            taken_seats = self.players['players_list']
+            taken_seats = self.next_game.values()
             available_seats = self.max_players.difference(taken_seats)
             new_player = list(available_seats)[0]
-            self.clients[self] = new_player
-            self.players['players_list'].append(new_player)
-            updated_players = simplejson.dumps(self.players)
-            for client in self.clients:
-                client.sendLine(updated_players)
+            self.next_game[self] = new_player
+            if not self.players['players_list']:
+                self.clients[self] = new_player
+                self.players['players_list'].append(new_player)
+                updated_players = simplejson.dumps(self.players)
+                for client in self.clients:
+                    client.sendLine(updated_players)
         else:
             table_full = {'table_full':None} 
             msg = simplejson.dumps(table_full)
@@ -158,9 +163,12 @@ class GameData(LineReceiver):
 
     def connectionLost(self, reason):
         print "Player %s disconnected!" % self
-        lost_player = self.clients[self]
-        self.players['players_list'].remove(lost_player)
-        del self.clients[self]
+        if self in self.clients:
+            lost_player = self.clients[self]
+            self.players['players_list'].remove(lost_player)
+            del self.clients[self]
+            self.dealer.seats = self.clients
+        del self.next_game[self]
         updated_players = simplejson.dumps(self.players)
         for client in self.clients:
             client.sendLine(updated_players)
@@ -169,6 +177,10 @@ class GameData(LineReceiver):
         game_msg = simplejson.loads(line)
         action = game_msg.keys()[0]
         if action == 'new_hand':  
+            for k in self.next_game.keys():
+                if k not in self.clients:
+                    self.clients[k] = self.next_game[k]
+                    self.players['players_list'].append(self.next_game[k])
             self.dealer.players = self.players
             self.dealer.seats = self.clients
             self.dealer.new_hand()
@@ -188,10 +200,14 @@ class BlackFactory(Factory):
         self.players = defaultdict(list)
         self.players['players_list']
         self.clients = dict() 
+        self.game = dict()
         self.dealer = Dealer(self.players, self.clients)
 
     def buildProtocol(self, addr):
-        return GameData(self.dealer, self.players, self.clients) 
+        return GameData(self.dealer, 
+                        self.players, 
+                        self.clients, 
+                        self.game) 
 
 
 if __name__ == '__main__':
