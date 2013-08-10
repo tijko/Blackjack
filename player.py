@@ -55,12 +55,13 @@ class Client(object):
             if msg_type == 'player_hands':
                 self.hand = load[self.pl_key][:2]
 
-    def players(self, player_list): 
+    def players(self, player_list):  
+        sorted(player_list)
         if not self.player:
             self.player = player_list[-1]
             self.pl_key = str(self.player)
         self.deal_lock = False
-        self.playrlst = player_list
+        self.playrlst = player_list 
 
     def player_turn(self, turn):
         if turn == self.player:
@@ -115,7 +116,7 @@ class Client(object):
         self.deal_lock = True
 
     @property
-    def stand(self):
+    def stand(self): 
         cur_players = sorted(self.playrlst)
         player_seat = cur_players.index(self.player)
         if player_seat + 1 == len(cur_players):
