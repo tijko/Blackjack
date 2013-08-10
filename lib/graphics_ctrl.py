@@ -1,4 +1,5 @@
 import pygame
+import time
 import os
 
 
@@ -48,6 +49,7 @@ class GameDisplay(object):
         self.screen.blit(self.banner, (205, 505))
         self.screen.blit(self.decoration, (565, 150))
         self.stand = self.screen.blit(self.stand_btn, (630, 420))
+        time.sleep(0.1)
         self.deal = self.screen.blit(self.deal_btn, (690, 380))
         self.hit = self.screen.blit(self.hit_btn, (562, 445))
         pygame.display.flip()
@@ -108,6 +110,33 @@ class GameDisplay(object):
 
     def tie_game(self):
         self.screen.blit(self.tie, (250, 200))
+        pygame.display.flip()
+
+    def stand_click(self):
+        btn_click = pygame.transform.scale(self.stand_btn, (65, 63))
+        self.screen.blit(btn_click, (632, 422))
+        pygame.display.flip()
+
+    def stand_unclick(self):
+        self.screen.blit(self.stand_btn, (630, 420))
+        pygame.display.flip()
+    
+    def hit_click(self):
+        btn_click = pygame.transform.scale(self.hit_btn, (65, 63))
+        self.screen.blit(btn_click, (564, 447))
+        pygame.display.flip()
+
+    def hit_unclick(self):
+        self.screen.blit(self.hit_btn, (562, 445))
+        pygame.display.flip()
+
+    def deal_click(self):
+        btn_click = pygame.transform.scale(self.deal_btn, (65, 63))
+        self.screen.blit(btn_click, (692, 383))
+        pygame.display.flip()
+
+    def deal_unclick(self):
+        self.screen.blit(self.deal_btn, (690, 380))
         pygame.display.flip()
 
     def exit(self):
