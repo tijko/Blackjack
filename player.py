@@ -90,7 +90,7 @@ class Client(object):
         if self.player_score > 21:
             self.player_bust()
         elif self.player_score == 21:
-            if len(self.hand) == 2: 
+            if self.hand and len(self.hand) == 2: 
                 self.player_bj = True
             self.stand
 
@@ -162,11 +162,22 @@ class Client(object):
                 # gets mouse coordinates if mouse clicked 
                 pos = pygame.mouse.get_pos()
                 if self.gd.stand.collidepoint(pos) and self.player == self.turn:
+                    self.gd.stand_click()
                     self.stand
                 if self.gd.deal.collidepoint(pos) and self.deal_lock == False:
+                    self.gd.deal_click()
                     self.deal
                 if self.gd.hit.collidepoint(pos) and self.player == self.turn:        
+                    self.gd.hit_click()
                     self.hit
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                pos = pygame.mouse.get_pos()
+                if self.gd.stand.collidepoint(pos):
+                    self.gd.stand_unclick()
+                if self.gd.deal.collidepoint(pos):
+                    self.gd.deal_unclick()
+                if self.gd.hit.collidepoint(pos):
+                    self.gd.hit_unclick()
 
     def table_full(self, msg):
         reactor.stop()
