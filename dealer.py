@@ -16,7 +16,7 @@ class Dealer(object):
         self.scores = dict()
 
     def new_hand(self):
-        players = simplejson.dumps(self.players)
+        players = simplejson.dumps(self.players) 
         self.signal_players(players)
         self.deal = HandEvents()  
         self.player_blackjacks = 0
@@ -181,6 +181,8 @@ class GameData(LineReceiver):
                 if k not in self.clients:
                     self.clients[k] = self.next_game[k]
                     self.players['players_list'].append(self.next_game[k])
+                    players_msg = simplejson.dumps(self.players)
+                    k.sendLine(players_msg)
             self.dealer.players = self.players
             self.dealer.seats = self.clients
             self.dealer.new_hand()
