@@ -94,7 +94,7 @@ class Dealer(object):
         if self.scores:
             self.dealer_take 
             if (any(i < 22 for i in self.scores.values()) 
-                and self.player_blackjacks < len(self.players)):
+                and self.player_blackjacks < len(self.players['players_list'])):
                 while self.score < 17:
                     self.dealer_take
             results_msg = {'results':None}
