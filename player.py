@@ -90,7 +90,7 @@ class Client(object):
         self.player_score = score_msg
         if self.player_score > 21:
             self.player_bust()
-        elif self.player_score == 21:
+        elif self.player_score == 21 and self.turn == self.player:
             if self.hand and len(self.hand) == 2: 
                 self.player_bj = True
             self.stand
