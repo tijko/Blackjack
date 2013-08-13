@@ -4,11 +4,11 @@ import os
 
 
 PATH = os.getcwd() + '/images/'
+os.environ['SDL_VIDEO_WINDOW_POS'] = '170, 30'
 
 class GameDisplay(object):
     
     def __init__(self):
-
         pygame.init()
         pygame.mouse.set_visible(1)
         self.screen = pygame.display.set_mode((800, 600))
@@ -32,7 +32,7 @@ class GameDisplay(object):
         self.hit_btn.convert_alpha()
         self.backdrop = pygame.image.load(PATH + 'black.jpg')
         self.backdrop.convert_alpha()
-        self.table = pygame.image.load(PATH + 'new.png')
+        self.table = pygame.image.load(PATH + 'table.png')
         self.table.convert_alpha()
         self.banner = pygame.image.load(PATH + 'banner.png')
         self.banner.convert_alpha()
@@ -40,18 +40,33 @@ class GameDisplay(object):
         self.decoration.convert_alpha()
         self.edge = pygame.image.load(PATH + 'edge.png')
         self.edge.convert_alpha()
-     
+        self.cardtray = pygame.image.load(PATH + 'cardtray.png')
+        self.cardtray.convert_alpha()
+        self.blue = pygame.image.load(PATH + 'blue.png')
+        self.blue.convert_alpha()
+        self.red = pygame.image.load(PATH + 'red.png')
+        self.red.convert_alpha()
+        self.green = pygame.image.load(PATH + 'green.png')
+        self.green.convert_alpha()
+        self.circle = pygame.image.load(PATH + 'position.png')
+        self.circle.convert_alpha()
+
     def default_scr(self):
-        self.positions = {'1':[50, 240], '2':[230, 360], '3':[460, 280]}
-        self.dspot_x = 290
+        self.positions = {'1':[70, 285], '2':[345, 375], '3':[560, 285]} 
+        bet_positions = {'1':[70, 240], '2':[345, 330], '3':[560, 240]}
+        self.dspot_x = 310 
         self.screen.blit(self.backdrop, (0, 0))
-        self.screen.blit(self.table, (0, 50))
-        self.screen.blit(self.banner, (205, 505))
-        self.screen.blit(self.decoration, (565, 150))
-        self.stand = self.screen.blit(self.stand_btn, (630, 420))
+        self.screen.blit(self.table, (-145, 0))
+        self.screen.blit(self.banner, (205, 505)) 
+        self.screen.blit(self.cardtray, (595, 5)) 
+        self.stand = self.screen.blit(self.stand_btn, (630, 420)) 
         time.sleep(0.1)
-        self.deal = self.screen.blit(self.deal_btn, (690, 380))
-        self.hit = self.screen.blit(self.hit_btn, (562, 445))
+        self.deal = self.screen.blit(self.deal_btn, (690, 380)) 
+        self.hit = self.screen.blit(self.hit_btn, (562, 445)) 
+        for i in bet_positions:
+            pos = bet_positions[i]
+            self.screen.blit(self.circle, (pos[0], pos[1] - 20))
+        self.screen.blit(self.red, (85, 235))
         pygame.display.flip()
 
     def display_hands(self, player_hands): 
@@ -70,73 +85,73 @@ class GameDisplay(object):
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
         self.screen.blit(card, (self.positions[player][0], 
-                               self.positions[player][1]))
+                                self.positions[player][1]))
         self.positions[player][0] += 30
         pygame.display.flip()
 
     def display_dealer(self, card):
-        self.screen.blit(self.edge, (332, 100))
+        self.screen.blit(self.edge, (352, 70)) 
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
-        self.screen.blit(card, (260, 100))
+        self.screen.blit(card, (280, 70)) 
         pygame.display.flip()
 
     def display_dealer_take(self, card):
         card = pygame.image.load(PATH + card[0])
         card.convert_alpha()
-        self.screen.blit(card, (self.dspot_x, 100))
+        self.screen.blit(card, (self.dspot_x, 70)) 
         self.dspot_x += 30
         pygame.display.flip()
 
     def dealer_blackjack(self):
-        self.screen.blit(self.dealer_bj, (200, 200))
+        self.screen.blit(self.dealer_bj, (200, 200)) 
         pygame.display.flip()
 
     def player_blackjack(self):
-        self.screen.blit(self.player_bj, (200, 200))
+        self.screen.blit(self.player_bj, (200, 200)) 
         pygame.display.flip()
 
     def dealer_win(self):
-        self.screen.blit(self.dealer_wins, (260, 200))
+        self.screen.blit(self.dealer_wins, (260, 200)) 
         pygame.display.flip()
 
     def player_win(self):
-        self.screen.blit(self.player_wins, (250, 200))
+        self.screen.blit(self.player_wins, (250, 200)) 
         pygame.display.flip()
 
     def player_bust(self):
-        self.screen.blit(self.bust, (150, 200))
+        self.screen.blit(self.bust, (150, 200)) 
         pygame.display.flip()
 
     def tie_game(self):
-        self.screen.blit(self.tie, (250, 200))
+        self.screen.blit(self.tie, (250, 200)) 
         pygame.display.flip()
 
     def stand_click(self):
         btn_click = pygame.transform.scale(self.stand_btn, (65, 63))
-        self.screen.blit(btn_click, (632, 422))
+        self.screen.blit(btn_click, (632, 422)) 
         pygame.display.flip()
 
     def stand_unclick(self):
-        self.screen.blit(self.stand_btn, (630, 420))
+        self.screen.blit(self.stand_btn, (630, 420)) 
         pygame.display.flip()
     
     def hit_click(self):
-        btn_click = pygame.transform.scale(self.hit_btn, (65, 63))
-        self.screen.blit(btn_click, (564, 447))
+        btn_click = pygame.transform.scale(self.hit_btn, (65, 63)) 
+        self.screen.blit(btn_click, (564, 447)) 
         pygame.display.flip()
 
     def hit_unclick(self):
-        self.screen.blit(self.hit_btn, (562, 445))
+        self.screen.blit(self.hit_btn, (562, 445)) 
         pygame.display.flip()
 
     def deal_click(self):
         btn_click = pygame.transform.scale(self.deal_btn, (65, 63))
-        self.screen.blit(btn_click, (692, 383))
+        self.screen.blit(btn_click, (692, 383)) 
         pygame.display.flip()
 
     def deal_unclick(self):
-        self.screen.blit(self.deal_btn, (690, 380))
+        self.screen.blit(self.deal_btn, (690, 380)) 
         pygame.display.flip()
 
     def exit(self):
