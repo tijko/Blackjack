@@ -41,12 +41,13 @@ class Dealer(object):
     @property
     def deal_players(self):
         self.hands = defaultdict(list)
-        deal_hands = {'player_hands':self.hands}
+        deal_hands = {'player_hands':defaultdict(list)}
         for player in self.players['players_list']:
             card1 = self.deal.deal_card()     
             card2 = self.deal.deal_card() 
             hand = [''.join(i for i in card1), ''.join(i for i in card2),
                     card1[1], card2[1]]
+            self.hands[player] = [card1[1], card2[1]]
             for card in hand[:2]: 
                 deal_hands['player_hands'][player].append(card)
             self.scores[player] = self.deal.total(hand[2:]) 
