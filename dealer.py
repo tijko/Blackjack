@@ -47,7 +47,7 @@ class Dealer(object):
             card2 = self.deal.deal_card() 
             hand = [''.join(i for i in card1), ''.join(i for i in card2),
                     card1[1], card2[1]]
-            for card in hand:
+            for card in hand[:2]: 
                 deal_hands['player_hands'][player].append(card)
             self.scores[player] = self.deal.total(hand[2:]) 
             if self.scores[player] == 21:
