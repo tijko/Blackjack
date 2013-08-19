@@ -3,6 +3,7 @@
 import simplejson
 import sys
 import os
+from collections import defaultdict
 
 import pygame
 
@@ -69,9 +70,12 @@ class Client(object):
             if self.player_score == 21:
                 self.player_bj = True
                 self.stand
+        self.gd.display_turn(turn)
         
     def player_hands(self, hands):
         self.gd.default_scr()
+        self.gd.player_data = defaultdict(list)
+        self.gd.dealer_data = list()
         self.deal_lock = True 
         self.gd.display_hands(hands)
 
@@ -90,7 +94,7 @@ class Client(object):
         self.player_score = score_msg
         if self.player_score > 21:
             self.player_bust()
-        elif self.player_score == 21 and self.turn == self.player:
+        elif self.player_score == 21 and self.turn == self.player: 
             if self.hand and len(self.hand) == 2: 
                 self.player_bj = True
             self.stand
