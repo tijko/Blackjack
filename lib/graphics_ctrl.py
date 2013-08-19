@@ -74,7 +74,6 @@ class GameDisplay(object):
     def display_hands(self, player_hands, turn=None): 
         for pl in player_hands:
             for card in player_hands[pl]:
-            #for card in player_hands[pl][:2]: edit
                 if not turn:
                     self.player_data[pl].append(card)
                 show_card = pygame.image.load(PATH + card)
@@ -104,9 +103,6 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def display_dealer_take(self, card):
-        self.default_scr()
-        self.display_dealer(self.dealer_data[0])
-        self.display_hands(self.player_data, turn=True)
         card = pygame.image.load(PATH + card[0])
         card.convert_alpha()
         self.screen.blit(card, (self.dspot_x, 70)) 
