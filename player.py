@@ -148,6 +148,8 @@ class Client(object):
             self.gd.dealer_blackjack()
         elif self.player_bj and not self.dealer_bj:
             self.gd.player_blackjack()
+        elif self.player_bj and self.dealer_bj:
+            self.gd.tie_game()
         elif self.dealer_score > 21:
             self.gd.player_win()
         elif self.dealer_score > self.player_score:
