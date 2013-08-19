@@ -71,6 +71,8 @@ class Client(object):
                 self.player_bj = True
                 self.stand
         self.gd.display_turn(turn)
+        if self.player_score > 21:
+            self.player_bust()
         
     def player_hands(self, hands):
         self.gd.default_scr()
