@@ -1,7 +1,7 @@
 import pygame
 import time
 import os
-
+from collections import defaultdict
 
 PATH = os.getcwd() + '/images/'
 os.environ['SDL_VIDEO_WINDOW_POS'] = '170, 30'
@@ -9,9 +9,11 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = '170, 30'
 class GameDisplay(object):
     
     def __init__(self):
-        pygame.init()
+        pygame.init() 
         pygame.mouse.set_visible(1)
         self.screen = pygame.display.set_mode((800, 600))
+        self.player_data = defaultdict(list)
+        self.dealer_data = list()
         self.bust = pygame.image.load(PATH + 'bust.png')
         self.bust.convert_alpha()
         self.dealer_bj = pygame.image.load(PATH + 'dealer_blackjack.png')
@@ -50,10 +52,12 @@ class GameDisplay(object):
         self.green.convert_alpha()
         self.circle = pygame.image.load(PATH + 'position.png')
         self.circle.convert_alpha()
+        self.turn = pygame.image.load(PATH + 'turn.png')
+        self.turn.convert_alpha()
 
     def default_scr(self):
-        self.positions = {'1':[70, 285], '2':[345, 375], '3':[560, 285]} 
-        bet_positions = {'1':[70, 240], '2':[345, 330], '3':[560, 240]}
+        self.positions = {'1':[70, 230], '2':[345, 320], '3':[560, 230]} 
+        bet_positions = [(70, 315), (345, 405), (560, 315)]
         self.dspot_x = 310 
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (-145, 0))
@@ -63,15 +67,16 @@ class GameDisplay(object):
         time.sleep(0.1)
         self.deal = self.screen.blit(self.deal_btn, (690, 380)) 
         self.hit = self.screen.blit(self.hit_btn, (562, 445)) 
-        for i in bet_positions:
-            pos = bet_positions[i]
-            self.screen.blit(self.circle, (pos[0], pos[1] - 20))
-        self.screen.blit(self.red, (85, 235))
+        for pos in bet_positions:
+            self.screen.blit(self.circle, (pos[0], pos[1]))
         pygame.display.flip()
 
-    def display_hands(self, player_hands): 
+    def display_hands(self, player_hands, turn=None): 
         for pl in player_hands:
-            for card in player_hands[pl][:2]:
+            for card in player_hands[pl]:
+            #for card in player_hands[pl][:2]: edit
+                if not turn:
+                    self.player_data[pl].append(card)
                 show_card = pygame.image.load(PATH + card)
                 show_card.convert_alpha()
                 self.screen.blit(show_card, (self.positions[pl][0],
@@ -82,6 +87,7 @@ class GameDisplay(object):
     def display_card(self, card_msg):
         player = card_msg.keys()[0]
         card = ''.join(i for i in card_msg[player])
+        self.player_data[str(player)].append(card)
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
         self.screen.blit(card, (self.positions[player][0], 
@@ -90,6 +96,7 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def display_dealer(self, card):
+        self.dealer_data.append(card)
         self.screen.blit(self.edge, (352, 70)) 
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
@@ -97,10 +104,22 @@ class GameDisplay(object):
         pygame.display.flip()
 
     def display_dealer_take(self, card):
+        self.default_scr()
+        self.display_dealer(self.dealer_data[0])
+        self.display_hands(self.player_data, turn=True)
         card = pygame.image.load(PATH + card[0])
         card.convert_alpha()
         self.screen.blit(card, (self.dspot_x, 70)) 
         self.dspot_x += 30
+        pygame.display.flip()
+
+    def display_turn(self, turn):
+        self.default_scr() 
+        self.display_dealer(self.dealer_data[0])
+        self.display_hands(self.player_data, turn=True)
+        turn_positions = {1:(45, 230), 2:(320, 320), 3:(535, 230)} 
+        pos = turn_positions[turn]
+        self.screen.blit(self.turn, pos)
         pygame.display.flip()
 
     def dealer_blackjack(self):
