@@ -55,9 +55,9 @@ class GameDisplay(object):
         self.options = pygame.image.load(PATH + 'options.png')
         self.options.convert_alpha()
 
-    def default_scr(self):
-        self.positions = {'1':[70, 230], '2':[345, 320], '3':[560, 230]} 
-        bet_positions = [(70, 315), (345, 405), (560, 315)]
+    def default_scr(self):  
+        self.positions = {'1':[40, 230], '2':[235, 320], '3':[450, 320], '4':[645, 250]} 
+        bet_positions = [(60, 315), (255, 405), (470, 405), (665, 335)]
         self.dspot_x = 310 
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (-145, 0))
@@ -80,7 +80,7 @@ class GameDisplay(object):
                 show_card.convert_alpha()
                 self.screen.blit(show_card, (self.positions[pl][0],
                                              self.positions[pl][1]))
-                self.positions[pl][0] += 30 
+                self.positions[pl][0] += 20 
         pygame.display.flip()
 
     def display_card(self, card_msg):
@@ -91,7 +91,7 @@ class GameDisplay(object):
         card.convert_alpha()
         self.screen.blit(card, (self.positions[player][0], 
                                 self.positions[player][1]))
-        self.positions[player][0] += 30
+        self.positions[player][0] += 20
         pygame.display.flip()
 
     def display_dealer(self, card):
@@ -113,7 +113,7 @@ class GameDisplay(object):
         self.default_scr() 
         self.display_dealer(self.dealer_data[0])
         self.display_hands(self.player_data, turn=True)
-        turn_positions = {1:(45, 230), 2:(320, 320), 3:(535, 230)} 
+        turn_positions = {1:(15, 230), 2:(210, 320), 3:(415, 320), 4:(620, 250)}  
         pos = turn_positions[turn]
         self.screen.blit(self.turn, pos)
         pygame.display.flip()
