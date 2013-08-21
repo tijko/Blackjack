@@ -93,9 +93,9 @@ class Dealer(object):
 
     def dealers_turn(self):
         if self.scores:
-            self.dealer_take 
-            if (any(i < 22 for i in self.scores.values()) 
-                and self.player_blackjacks < len(self.players['players_list'])):
+            self.dealer_take  
+            players_in = [i for i in self.scores.values() if i < 22]
+            if players_in and self.player_blackjacks < len(players_in):
                 while self.score < 17:
                     self.dealer_take
             results_msg = {'results':None}
@@ -143,7 +143,7 @@ class GameData(LineReceiver):
         self.clients = clients 
         self.dealer = dealer
         self.next_game = game
-        self.max_players = set(range(1, 4))
+        self.max_players = set(range(1, 4)) 
 
     def connectionMade(self):
         if len(self.players['players_list']) <= 3:
