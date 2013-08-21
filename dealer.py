@@ -143,7 +143,7 @@ class GameData(LineReceiver):
         self.clients = clients 
         self.dealer = dealer
         self.next_game = game
-        self.max_players = set(range(1, 4)) 
+        self.max_players = set(range(1, 5)) 
 
     def connectionMade(self):
         if len(self.players['players_list']) <= 3:
