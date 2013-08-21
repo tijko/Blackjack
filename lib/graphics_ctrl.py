@@ -36,8 +36,6 @@ class GameDisplay(object):
         self.backdrop.convert_alpha()
         self.table = pygame.image.load(PATH + 'table.png')
         self.table.convert_alpha()
-        self.banner = pygame.image.load(PATH + 'banner.png')
-        self.banner.convert_alpha()
         self.decoration = pygame.image.load(PATH + 'start.png')
         self.decoration.convert_alpha()
         self.edge = pygame.image.load(PATH + 'edge.png')
@@ -54,6 +52,8 @@ class GameDisplay(object):
         self.circle.convert_alpha()
         self.turn = pygame.image.load(PATH + 'turn.png')
         self.turn.convert_alpha()
+        self.options = pygame.image.load(PATH + 'options.png')
+        self.options.convert_alpha()
 
     def default_scr(self):
         self.positions = {'1':[70, 230], '2':[345, 320], '3':[560, 230]} 
@@ -61,12 +61,12 @@ class GameDisplay(object):
         self.dspot_x = 310 
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (-145, 0))
-        self.screen.blit(self.banner, (205, 505)) 
+        self.screen.blit(self.options, (205, 495))
         self.screen.blit(self.cardtray, (595, 5)) 
-        self.stand = self.screen.blit(self.stand_btn, (630, 420)) 
+        self.stand = self.screen.blit(self.stand_btn, (450, 515)) 
         time.sleep(0.1)
-        self.deal = self.screen.blit(self.deal_btn, (690, 380)) 
-        self.hit = self.screen.blit(self.hit_btn, (562, 445)) 
+        self.deal = self.screen.blit(self.deal_btn, (365, 515)) 
+        self.hit = self.screen.blit(self.hit_btn, (280, 515)) 
         for pos in bet_positions:
             self.screen.blit(self.circle, (pos[0], pos[1]))
         pygame.display.flip()
@@ -144,29 +144,29 @@ class GameDisplay(object):
 
     def stand_click(self):
         btn_click = pygame.transform.scale(self.stand_btn, (65, 63))
-        self.screen.blit(btn_click, (632, 422)) 
+        self.screen.blit(btn_click, (452, 517)) 
         pygame.display.flip()
 
     def stand_unclick(self):
-        self.screen.blit(self.stand_btn, (630, 420)) 
+        self.screen.blit(self.stand_btn, (450, 515)) 
         pygame.display.flip()
     
     def hit_click(self):
         btn_click = pygame.transform.scale(self.hit_btn, (65, 63)) 
-        self.screen.blit(btn_click, (564, 447)) 
+        self.screen.blit(btn_click, (282, 517)) 
         pygame.display.flip()
 
     def hit_unclick(self):
-        self.screen.blit(self.hit_btn, (562, 445)) 
+        self.screen.blit(self.hit_btn, (280, 515)) 
         pygame.display.flip()
 
     def deal_click(self):
         btn_click = pygame.transform.scale(self.deal_btn, (65, 63))
-        self.screen.blit(btn_click, (692, 383)) 
+        self.screen.blit(btn_click, (367, 517)) 
         pygame.display.flip()
 
     def deal_unclick(self):
-        self.screen.blit(self.deal_btn, (690, 380)) 
+        self.screen.blit(self.deal_btn, (365, 515)) 
         pygame.display.flip()
 
     def exit(self):
