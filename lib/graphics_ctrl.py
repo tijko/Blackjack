@@ -16,16 +16,14 @@ class GameDisplay(object):
         self.dealer_data = list()
         self.bust = pygame.image.load(PATH + 'bust.png')
         self.bust.convert_alpha()
-        self.dealer_bj = pygame.image.load(PATH + 'dealer_blackjack.png')
-        self.dealer_bj.convert_alpha()
-        self.player_bj = pygame.image.load(PATH + 'player_blackjack.png')
-        self.player_bj.convert_alpha()
-        self.dealer_wins = pygame.image.load(PATH + 'dealer_wins.png')
-        self.dealer_wins.convert_alpha()
-        self.player_wins = pygame.image.load(PATH + 'player_wins.png')
-        self.player_wins.convert_alpha()
-        self.tie = pygame.image.load(PATH + 'tie.png')
-        self.tie.convert_alpha()
+        self.bj = pygame.image.load(PATH + 'blackjack.png')
+        self.bj.convert_alpha()
+        self.lose = pygame.image.load(PATH + 'lose.png')
+        self.lose.convert_alpha()
+        self.win = pygame.image.load(PATH + 'win.png')
+        self.win.convert_alpha()
+        self.push = pygame.image.load(PATH + 'push.png')
+        self.push.convert_alpha()
         self.stand_btn = pygame.image.load(PATH + 'stand.png')
         self.stand_btn.convert_alpha()
         self.deal_btn = pygame.image.load(PATH + 'deal.png')
@@ -57,8 +55,9 @@ class GameDisplay(object):
 
     def default_scr(self):  
         self.positions = {'1':[40, 230], '2':[235, 320], '3':[450, 320], '4':[645, 250]} 
+        self.results = {'1':[0, 250], '2':[195, 340], '3':[410, 340], '4':[605, 270]}
         bet_positions = [(60, 315), (255, 405), (470, 405), (665, 335)]
-        self.dspot_x = 310 
+        self.dspot_x = 340 
         self.screen.blit(self.backdrop, (0, 0))
         self.screen.blit(self.table, (-600, -120))
         self.screen.blit(self.options, (205, 495))
@@ -96,10 +95,10 @@ class GameDisplay(object):
 
     def display_dealer(self, card):
         self.dealer_data.append(card)
-        self.screen.blit(self.edge, (352, 70)) 
+        self.screen.blit(self.edge, (382, 70)) 
         card = pygame.image.load(PATH + card)
         card.convert_alpha()
-        self.screen.blit(card, (280, 70)) 
+        self.screen.blit(card, (310, 70)) 
         pygame.display.flip()
 
     def display_dealer_take(self, card):
@@ -118,28 +117,35 @@ class GameDisplay(object):
         self.screen.blit(self.turn, pos)
         pygame.display.flip()
 
-    def dealer_blackjack(self):
-        self.screen.blit(self.dealer_bj, (200, 200)) 
+    def display_results(self, outcome, player):
+        results = {'win':self.player_win, 
+                   'lose':self.dealer_win,
+                   'bust':self.player_bust,
+                   'tie':self.tie_game,
+                   'bj':self.player_blackjack}
+        pos = self.results[player]
+        pos[0] += (len(self.player_data[player]) * 10)
+        show_results = results[outcome]
+        show_results(pos)
+
+    def player_blackjack(self, pos):
+        self.screen.blit(self.bj, (pos[0], pos[1])) 
         pygame.display.flip()
 
-    def player_blackjack(self):
-        self.screen.blit(self.player_bj, (200, 200)) 
+    def dealer_win(self, pos):
+        self.screen.blit(self.lose, (pos[0], pos[1])) 
         pygame.display.flip()
 
-    def dealer_win(self):
-        self.screen.blit(self.dealer_wins, (260, 200)) 
+    def player_win(self, pos):
+        self.screen.blit(self.win, (pos[0], pos[1])) 
         pygame.display.flip()
 
-    def player_win(self):
-        self.screen.blit(self.player_wins, (250, 200)) 
+    def player_bust(self, pos):
+        self.screen.blit(self.bust, (pos[0], pos[1])) 
         pygame.display.flip()
 
-    def player_bust(self):
-        self.screen.blit(self.bust, (150, 200)) 
-        pygame.display.flip()
-
-    def tie_game(self):
-        self.screen.blit(self.tie, (250, 200)) 
+    def tie_game(self, pos):
+        self.screen.blit(self.push, (pos[0], pos[1])) 
         pygame.display.flip()
 
     def stand_click(self):
