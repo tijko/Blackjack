@@ -72,7 +72,7 @@ class Client(object):
                 self.stand
         self.gd.display_turn(turn)
         if self.player_score > 21:
-            self.gd.player_bust()
+            self.gd.display_results('bust', self.pl_key)
         
     def player_hands(self, hands):
         self.gd.default_scr()
@@ -89,7 +89,7 @@ class Client(object):
         self.gd.display_card(card_msg)
 
     def player_bust(self):
-        self.gd.player_bust()
+        self.gd.display_results('bust', self.pl_key)
         self.stand
 
     def total_score(self, score_msg):
@@ -145,19 +145,19 @@ class Client(object):
 
     def results(self):
         if self.dealer_bj and not self.player_bj:	
-            self.gd.dealer_blackjack()
+            self.gd.display_results('lose', self.pl_key)
         elif self.player_bj and not self.dealer_bj:
-            self.gd.player_blackjack()
+            self.gd.display_results('bj', self.pl_key)
         elif self.player_bj and self.dealer_bj:
-            self.gd.tie_game()
+            self.gd.display_results('tie', self.pl_key)
         elif self.dealer_score > 21:
-            self.gd.player_win()
+            self.gd.display_results('win', self.pl_key)
         elif self.dealer_score > self.player_score:
-            self.gd.dealer_win()
+            self.gd.display_results('lose', self.pl_key)
         elif self.dealer_score == self.player_score:
-            self.gd.tie_game()
+            self.gd.display_results('tie', self.pl_key)
         elif self.dealer_score < self.player_score:
-            self.gd.player_win()
+            self.gd.display_results('win', self.pl_key)
                
     def py_event(self):
         for event in pygame.event.get():
