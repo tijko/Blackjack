@@ -52,8 +52,6 @@ class GameDisplay(object):
         self.circle.convert_alpha()
         self.turn = pygame.image.load(PATH + 'turn.png')
         self.turn.convert_alpha()
-        self.tablemsg = pygame.image.load(PATH + 'tablemsg.png')
-        self.tablemsg.convert_alpha()
         self.options = pygame.image.load(PATH + 'options.png')
         self.options.convert_alpha()
 
@@ -62,10 +60,9 @@ class GameDisplay(object):
         bet_positions = [(60, 315), (255, 405), (470, 405), (665, 335)]
         self.dspot_x = 310 
         self.screen.blit(self.backdrop, (0, 0))
-        self.screen.blit(self.table, (-145, 0))
-        self.screen.blit(self.tablemsg, (205, 175))
+        self.screen.blit(self.table, (-600, -120))
         self.screen.blit(self.options, (205, 495))
-        self.screen.blit(self.cardtray, (595, 5)) 
+        self.screen.blit(self.cardtray, (605, -10)) 
         self.stand = self.screen.blit(self.stand_btn, (450, 515)) 
         time.sleep(0.1)
         self.deal = self.screen.blit(self.deal_btn, (365, 515)) 
