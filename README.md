@@ -13,6 +13,8 @@ connect to your local network.
 
 Blackjack uses pygames, if you don't already have pygames installed, you can get a copy [here](http://www.pygame.org/news.html).
 
+Blackjack server and clients use the Twisted network engine, you can install Twisted from [here](https://twistedmatrix.com/trac/).
+
 Have someone run the dealer.py file.  Which ever person is running the dealer file, you are
 going to need that person's machines internal ip address.  Once you know that address,
 then everyone adds that in on line #227 in the player.py file in between the parenthesis:
