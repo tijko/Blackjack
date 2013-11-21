@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-import simplejson, random, itertools
+import simplejson
+import random
+import itertools
 from collections import defaultdict
 
 from twisted.internet.protocol import Factory
@@ -120,8 +122,7 @@ class HandEvents(object):
         random.shuffle(self.deck)
 
     def deal_card(self):
-        card = self.deck[0]
-        self.deck.pop(0) 
+        card = self.deck.pop(0)
         return card
 
     def total(self, cards):
