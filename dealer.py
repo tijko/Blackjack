@@ -179,7 +179,7 @@ class GameData(LineReceiver):
         game_msg = simplejson.loads(line)
         action = game_msg.keys()[0]
         if action == 'new_hand':  
-            for k in self.next_game.keys():
+            for k in self.next_game:
                 if k not in self.clients:
                     self.clients[k] = self.next_game[k]
                     self.players['players_list'].append(self.next_game[k])
