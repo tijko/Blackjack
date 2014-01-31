@@ -12,23 +12,23 @@ from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.task import LoopingCall
 
-from lib.graphics_ctrl import GameDisplay
+from lib.graphics_ctrl import Table 
 
 
-class Client(object):
+class Client(Table):
     """
     Class to handle setting default screen, to check data received from the server,
     send data to the server, and handle pygame events.
     """
     def __init__(self):
+        super(Client, self).__init__()
         self.turn = 0
         self.player = None
         self.hand = None
         self.deal_lock = True 
         self.dealer_bj = False
         self.player_bj = False
-        self.gd = GameDisplay()
-        self.gd.default_scr()
+        self.default_scr()
         self.msg_actions = {'table_full':self.table_full,
                             'players_list':self.players,
                             'player_card':self.player_card,
@@ -70,39 +70,39 @@ class Client(object):
             if self.player_score == 21:
                 self.player_bj = True
                 self.stand
-        self.gd.display_turn(turn)
+        self.display_turn(turn)
         if self.player_score > 21:
-            self.gd.display_results('bust', self.pl_key)
+            self.display_results('bust', self.pl_key)
         
     def player_hands(self, hands):
-        self.gd.default_scr()
-        self.gd.player_data = defaultdict(list)
-        self.gd.dealer_data = list()
+        self.default_scr()
+        self.player_data = defaultdict(list)
+        self.dealer_data = list()
         self.deal_lock = True 
-        self.gd.display_hands(hands)
+        self.display_hands(hands)
 
     def player_card(self, card_msg): 
         player = card_msg.keys()[0]
         card = ''.join(i for i in card_msg[player])
         if player == self.pl_key:
             self.hand.append(card)
-        self.gd.display_card(card_msg)
+        self.display_card(card_msg)
 
-    def player_bust(self):
-        self.gd.display_results('bust', self.pl_key)
+    def show_player_bust(self):
+        self.display_results('bust', self.pl_key)
         self.stand
 
     def total_score(self, score_msg):
         self.player_score = score_msg
         if self.player_score > 21:
-            self.player_bust()
+            self.show_player_bust()
         elif self.player_score == 21 and self.turn == self.player: 
             if self.hand and len(self.hand) == 2: 
                 self.player_bj = True
             self.stand
 
     def dealer_hand(self, hand):
-        self.gd.display_dealer(hand[0])
+        self.display_dealer(hand[0])
         self.dealer_hand = [hand[0]]
 
     def dealer_score(self, score):
@@ -112,7 +112,7 @@ class Client(object):
 
     def dealer_card(self, card):
         self.dealer_hand.append(card[1])
-        self.gd.display_dealer_take(card)
+        self.display_dealer_take(card)
 
     @property
     def deal(self):
@@ -145,19 +145,19 @@ class Client(object):
 
     def results(self):
         if self.dealer_bj and not self.player_bj:	
-            self.gd.display_results('lose', self.pl_key)
+            self.display_results('lose', self.pl_key)
         elif self.player_bj and not self.dealer_bj:
-            self.gd.display_results('bj', self.pl_key)
+            self.display_results('bj', self.pl_key)
         elif self.player_bj and self.dealer_bj:
-            self.gd.display_results('tie', self.pl_key)
+            self.display_results('tie', self.pl_key)
         elif self.dealer_score > 21:
-            self.gd.display_results('win', self.pl_key)
+            self.display_results('win', self.pl_key)
         elif self.dealer_score > self.player_score:
-            self.gd.display_results('lose', self.pl_key)
+            self.display_results('lose', self.pl_key)
         elif self.dealer_score == self.player_score:
-            self.gd.display_results('tie', self.pl_key)
+            self.display_results('tie', self.pl_key)
         elif self.dealer_score < self.player_score:
-            self.gd.display_results('win', self.pl_key)
+            self.display_results('win', self.pl_key)
                
     def py_event(self):
         for event in pygame.event.get():
@@ -165,32 +165,32 @@ class Client(object):
                 return
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 reactor.stop()
-                self.gd.exit()
+                self.exit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # gets mouse coordinates if mouse clicked 
                 pos = pygame.mouse.get_pos()
-                if self.gd.stand.collidepoint(pos) and self.player == self.turn:
-                    self.gd.stand_click()
+                if self.stand_rect.collidepoint(pos) and self.player == self.turn:
+                    self.stand_click()
                     self.stand
-                if self.gd.deal.collidepoint(pos) and self.deal_lock == False:
-                    self.gd.deal_click()
+                if self.deal_rect.collidepoint(pos) and self.deal_lock == False:
+                    self.deal_click()
                     self.deal
-                if self.gd.hit.collidepoint(pos) and self.player == self.turn:        
-                    self.gd.hit_click()
+                if self.hit_rect.collidepoint(pos) and self.player == self.turn:        
+                    self.hit_click()
                     self.hit
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 pos = pygame.mouse.get_pos()
-                if self.gd.stand.collidepoint(pos):
-                    self.gd.stand_unclick()
-                if self.gd.deal.collidepoint(pos):
-                    self.gd.deal_unclick()
-                if self.gd.hit.collidepoint(pos):
-                    self.gd.hit_unclick()
+                if self.stand_rect.collidepoint(pos):
+                    self.stand_unclick()
+                if self.deal_rect.collidepoint(pos):
+                    self.deal_unclick()
+                if self.hit_rect.collidepoint(pos):
+                    self.hit_unclick()
 
     def table_full(self, msg):
         reactor.stop()
-        self.gd.exit()
+        self.exit()
         print "Table Full"
 
 
@@ -224,5 +224,5 @@ if __name__ == '__main__':
     # LoopingCall method to keep checking 'tick' method for pygame events 
     lc = LoopingCall(c.py_event)
     lc.start(0.1)
-    reactor.connectTCP('', 6000, BlackClient(c))
+    reactor.connectTCP('127.0.0.1', 6000, BlackClient(c))
     reactor.run()
