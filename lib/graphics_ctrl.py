@@ -3,10 +3,11 @@ import time
 import os
 from collections import defaultdict
 
+
 PATH = os.getcwd() + '/images/'
 os.environ['SDL_VIDEO_WINDOW_POS'] = '170, 30'
 
-class GameDisplay(object):
+class Table(object):
     
     def __init__(self):
         pygame.init() 
@@ -48,8 +49,8 @@ class GameDisplay(object):
         self.green.convert_alpha()
         self.circle = pygame.image.load(PATH + 'position.png')
         self.circle.convert_alpha()
-        self.turn = pygame.image.load(PATH + 'turn.png')
-        self.turn.convert_alpha()
+        self.turn_marker = pygame.image.load(PATH + 'turn.png')
+        self.turn_marker.convert_alpha()
         self.options = pygame.image.load(PATH + 'options.png')
         self.options.convert_alpha()
 
@@ -62,10 +63,10 @@ class GameDisplay(object):
         self.screen.blit(self.table, (-600, -120))
         self.screen.blit(self.options, (205, 495))
         self.screen.blit(self.cardtray, (605, -10)) 
-        self.stand = self.screen.blit(self.stand_btn, (450, 515)) 
+        self.stand_rect = self.screen.blit(self.stand_btn, (450, 515)) 
         time.sleep(0.1)
-        self.deal = self.screen.blit(self.deal_btn, (365, 515)) 
-        self.hit = self.screen.blit(self.hit_btn, (280, 515)) 
+        self.deal_rect = self.screen.blit(self.deal_btn, (365, 515)) 
+        self.hit_rect = self.screen.blit(self.hit_btn, (280, 515)) 
         for pos in bet_positions:
             self.screen.blit(self.circle, (pos[0], pos[1]))
         pygame.display.flip()
@@ -114,7 +115,7 @@ class GameDisplay(object):
         self.display_hands(self.player_data, turn=True)
         turn_positions = {1:(15, 230), 2:(210, 320), 3:(415, 320), 4:(620, 250)}  
         pos = turn_positions[turn]
-        self.screen.blit(self.turn, pos)
+        self.screen.blit(self.turn_marker, pos)
         pygame.display.flip()
 
     def display_results(self, outcome, player):
@@ -177,4 +178,3 @@ class GameDisplay(object):
 
     def exit(self):
         pygame.display.quit()
-
