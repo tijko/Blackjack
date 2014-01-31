@@ -56,7 +56,7 @@ class Table(object):
 
     def default_scr(self):  
         self.positions = {'1':[40, 230], '2':[235, 320], '3':[450, 320], '4':[645, 250]} 
-        self.results = {'1':[0, 250], '2':[195, 340], '3':[410, 340], '4':[605, 270]}
+        self.results_coords = {'1':[0, 250], '2':[195, 340], '3':[410, 340], '4':[605, 270]}
         bet_positions = [(60, 315), (255, 405), (470, 405), (665, 335)]
         self.dspot_x = 340 
         self.screen.blit(self.backdrop, (0, 0))
@@ -124,7 +124,7 @@ class Table(object):
                    'bust':self.player_bust,
                    'tie':self.tie_game,
                    'bj':self.player_blackjack}
-        pos = self.results[player]
+        pos = self.results_coords[player]
         pos[0] += (len(self.player_data[player]) * 10)
         show_results = results[outcome]
         show_results(pos)
