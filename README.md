@@ -23,4 +23,4 @@ then everyone adds that in on line #227 in the player.py file in between the par
  
 Then everyone runs their own player.py file. 
 
-[Sample-Game](images/blackjack-table.png)
+![Sample-Game](images/blackjack-table.png)
