@@ -1,4 +1,4 @@
-#Blackjack
+# Blackjack
 
 This is your classic blackjack game, with standard blackjack rules.
 
@@ -9,7 +9,7 @@ Each player can be on their own separate computer/device as long as it can run p
 connect to your local network.
 
 
-###Configure
+### Configure
 
 Blackjack uses pygames, if you don't already have pygames installed, you can get a copy [here](http://www.pygame.org/news.html).
 
