@@ -84,7 +84,7 @@ class Table(object):
         pygame.display.flip()
 
     def display_card(self, card_msg):
-        player = card_msg.keys()[0]
+        player = list(card_msg.keys())[0]
         card = ''.join(i for i in card_msg[player])
         self.player_data[str(player)].append(card)
         card = pygame.image.load(PATH + card)
