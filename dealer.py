@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-
+#
+import time
+#
 import simplejson
 import random
-import itertools
 from collections import defaultdict
 
 from twisted.internet.protocol import Factory
@@ -91,7 +92,7 @@ class Dealer(object):
         player_seats = {v:k for k,v in self.seats.items()}
         score_msg = {'score':self.scores[player]}
         score_msg = simplejson.dumps(score_msg)
-        player_seats[player].sendLine(score_msg)
+        player_seats[player].sendLine(score_msg.encode("utf-8"))
 
     def dealers_turn(self):
         if self.scores:
@@ -107,7 +108,7 @@ class Dealer(object):
 
     def signal_players(self, msg):
         for player in self.seats:
-            player.sendLine(msg)        
+            player.sendLine(msg.encode("utf-8"))        
 
 
 class HandEvents(object):
@@ -118,7 +119,7 @@ class HandEvents(object):
                       'six.png':6, 'seven.png':7, 'eight.png':8, 'nine.png':9, 
                       'ten.png':10, 'jack.png':10, 'queen.png':10, 
                       'king.png':10, 'ace.png':11}
-        self.deck = list(itertools.izip(self.suits, self.cards.keys() * 4)) * 6
+        self.deck = list(zip(self.suits, list(self.cards.keys()) * 4)) * 6
         random.shuffle(self.deck)
 
     def deal_card(self):
@@ -128,7 +129,7 @@ class HandEvents(object):
     def total(self, cards):
         amount = 0
         for card in cards:
-            if self.cards.has_key(card):
+            if card in self.cards:
                 amount += self.cards[card]
         if amount > 21 and 'ace.png' in cards: 
             for i in range(cards.count('ace.png')): 
@@ -157,14 +158,14 @@ class GameData(LineReceiver):
                 self.players['players_list'].append(new_player)
                 updated_players = simplejson.dumps(self.players)
                 for client in self.clients:
-                    client.sendLine(updated_players)
+                    client.sendLine(updated_players.encode("utf-8"))
         else:
             table_full = {'table_full':None} 
             msg = simplejson.dumps(table_full)
-            self.sendLine(msg)
+            self.sendLine(msg.encode("utf-8"))
 
     def connectionLost(self, reason):
-        print "Player %s disconnected!" % self
+        print("Player {} disconnected!".format(self))
         if self in self.clients:
             lost_player = self.clients[self]
             self.players['players_list'].remove(lost_player)
@@ -173,18 +174,18 @@ class GameData(LineReceiver):
         del self.next_game[self]
         updated_players = simplejson.dumps(self.players)
         for client in self.clients:
-            client.sendLine(updated_players)
+            client.sendLine(updated_players.encode("utf-8"))
 
     def lineReceived(self, line):
         game_msg = simplejson.loads(line)
-        action = game_msg.keys()[0]
+        action = list(game_msg.keys())[0]
         if action == 'new_hand':  
             for k in self.next_game:
                 if k not in self.clients:
                     self.clients[k] = self.next_game[k]
                     self.players['players_list'].append(self.next_game[k])
                     players_msg = simplejson.dumps(self.players)
-                    k.sendLine(players_msg)
+                    k.sendLine(players_msg.encode("utf-8"))
             self.dealer.players = self.players
             self.dealer.seats = self.clients
             self.dealer.new_hand()
@@ -195,7 +196,7 @@ class GameData(LineReceiver):
         else:
             game_msg = simplejson.dumps(game_msg)
             for client in self.clients:
-                client.sendLine(game_msg)
+                client.sendLine(game_msg.encode("utf-8"))
 
 
 class BlackFactory(Factory):

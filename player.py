@@ -43,7 +43,7 @@ class Client(Table):
 
     def game_messages(self, msg): 
         game_msg = simplejson.loads(msg)
-        msg_type = game_msg.keys()[0]
+        msg_type = list(game_msg.keys())[0]
         if msg_type == 'results':
             if self.player_score <= 21:
                 self.results()        
@@ -82,7 +82,7 @@ class Client(Table):
         self.display_hands(hands)
 
     def player_card(self, card_msg): 
-        player = card_msg.keys()[0]
+        player = list(card_msg.keys())[0]
         card = ''.join(i for i in card_msg[player])
         if player == self.pl_key:
             self.hand.append(card)
@@ -118,7 +118,7 @@ class Client(Table):
     def deal(self):
         deal_msg = {'new_hand':None}
         deal_msg = simplejson.dumps(deal_msg)
-        self.sendLine(deal_msg)                    
+        self.sendLine(deal_msg.encode("utf-8"))                    
         self.deal_lock = True
 
     @property
@@ -128,20 +128,20 @@ class Client(Table):
         if player_seat + 1 == len(cur_players):
             dealer_msg = {'dealers_turn':None}
             dealer_msg = simplejson.dumps(dealer_msg)
-            self.sendLine(dealer_msg)
+            self.sendLine(dealer_msg.encode("utf-8"))
             self.turn = 0
         else:
             self.turn = cur_players[player_seat + 1]
             turn_msg = {'turn':self.turn}
             turn_msg = simplejson.dumps(turn_msg)
-            self.sendLine(turn_msg)
+            self.sendLine(turn_msg.encode("utf-8"))
 
     @property
     def hit(self):
         if self.player_score < 21:
             hit_msg = {'player_card':self.player}
             hit_msg = simplejson.dumps(hit_msg)
-            self.sendLine(hit_msg)
+            self.sendLine(hit_msg.encode("utf-8"))
 
     def results(self):
         if self.dealer_bj and not self.player_bj:	
@@ -191,7 +191,7 @@ class Client(Table):
     def table_full(self, msg):
         reactor.stop()
         self.exit()
-        print "Table Full"
+        print("Table Full")
 
 
 class BlackClientProtocol(LineReceiver):
