@@ -22,3 +22,5 @@ then everyone adds that in on line #227 in the player.py file in between the par
     reactor.connectTCP('THAT ADDRESS HERE', 6000 BlackClient(c))
  
 Then everyone runs their own player.py file. 
+
+[Sample-Game](images/blackjack-table.png)
