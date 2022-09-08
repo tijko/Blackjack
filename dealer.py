@@ -48,7 +48,7 @@ class Dealer(object):
         for player in self.players['players_list']:
             card1 = self.deal.deal_card()     
             card2 = self.deal.deal_card() 
-            hand = [''.join(i for i in card1), ''.join(i for i in card2),
+            hand = [''.join(card1), ''.join(card2),
                     card1[1], card2[1]]
             self.hands[player] = [card1[1], card2[1]]
             for card in hand[:2]: 
@@ -63,7 +63,7 @@ class Dealer(object):
     @property
     def deal_dealer(self):
         card1 = self.deal.deal_card()
-        hand = [''.join(i for i in card1), card1[1]]
+        hand = [''.join(card1), card1[1]]
         self.hand = list(card1[1:])
         dealer_start = {'dealer_start':hand}
         dealer_start = simplejson.dumps(dealer_start)
@@ -77,7 +77,7 @@ class Dealer(object):
     def dealer_take(self):
         card = self.deal.deal_card()
         self.hand.append(card[1])
-        dealer_card = {'dealer_card':[''.join(i for i in card), card[1]]}
+        dealer_card = {'dealer_card':[''.join(card), card[1]]}
         dealer_card = simplejson.dumps(dealer_card)
         self.score = self.deal.total(self.hand)
         if len(self.hand) == 2 and self.score == 21:
